@@ -1,0 +1,1 @@
+A Mod platform which allows developers to write Python Packages and be run on top of the JVM. The program is rendered and ultimately controlled by the Java Code, but first all of the mod's python code is compiled and loaded onto the JVM. The Java program has API hooks which allow for things like levels, sprites, lighting, and logic control objects to be loaded into the game.

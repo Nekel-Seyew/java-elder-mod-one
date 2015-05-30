@@ -7,6 +7,7 @@ from Game import Player
 from Game import Sprite
 from GlowEnemy import GlowEnemy
 from Projectile import Projectile
+from Game import TextBox
 
 from eldermodone import MainGame
 #import HelloWorldMod.KeyboardCont
@@ -42,7 +43,7 @@ walls =[[0,0,0,0,0,0,1,1,1,0,0,0,0,0,0],
 		[0,0,0,0,0,0,1,1,1,0,0,0,0,0,0]]
 level.setFloor(stuff)
 level.putFloorSprite(1,"ShadowRunMod/sprites/floors/floor1.png")
-level.putWallSprite(1,["ShadowRunMod/sprites/walls/wall1.png","ShadowRunMod/sprites/walls/eagle.png"],250)
+level.putWallSprite(1,"ShadowRunMod/sprites/walls/wall1.png")
 level.setWalls(walls)
 
 glowenemy = GlowEnemy(Vector2(6.5,7.5),2,"ShadowRunMod/sprites/enemy/spheroid.png",0x54F9FF,2)
@@ -50,9 +51,13 @@ level.addLighting(glowenemy.getLight())
 maingame.addUpdateable(glowenemy)
 level.addSprite(glowenemy.getDrawable())
 
-projectile = Projectile(["ShadowRunMod/sprites/enemy/projectile/basic-1.png","ShadowRunMod/sprites/enemy/projectile/basic-2.png","ShadowRunMod/sprites/enemy/projectile/basic-3.png","ShadowRunMod/sprites/enemy/projectile/basic-4.png"],Vector2(10,7.5),0x000000,250,0.25,Vector2(-1,0))
-maingame.addUpdateable(projectile)
-level.addSprite(projectile.getSprite())
+textbox = TextBox(Vector2(400,300),Vector2(750,100),0xFFFFFF,"Hello Decker...\nWelcome to The Grid.",0,0,0x000000,500,13,5,0x00FF00,1000);
+maingame.addUpdateable(textbox)
+maingame.addGuiElement(textbox)
+
+#projectile = Projectile(["ShadowRunMod/sprites/enemy/projectile/basic-1.png","ShadowRunMod/sprites/enemy/projectile/basic-2.png","ShadowRunMod/sprites/enemy/projectile/basic-3.png","ShadowRunMod/sprites/enemy/projectile/basic-4.png"],Vector2(10,7.5),0x000000,250,0.25,Vector2(-1,0))
+#maingame.addUpdateable(projectile)
+#level.addSprite(projectile.getSprite())
 
 '''
 #note, the vertical axis is your X, and the horizontal is the Y. Because yes.....

@@ -13,6 +13,7 @@ import Utilities.Image2D;
 import Utilities.ImageCollection;
 import Utilities.Vector2;
 import java.awt.Color;
+import java.util.ArrayList;
 
 /**
  *
@@ -21,6 +22,7 @@ import java.awt.Color;
 public class TextBox implements Updateable, GuiElement{
 
     private String text;
+    private ArrayList<String> textarray;
     private Color background;
     private Color textColor;
     private int speed;
@@ -40,6 +42,7 @@ public class TextBox implements Updateable, GuiElement{
     private int index;
     private long lastTime;
     private boolean done;
+    private int lineNum;
     
     public TextBox(Vector2 centerlocation, Vector2 dimentions, int background,
             String text, int type, int style, int textcolor, 
@@ -59,6 +62,10 @@ public class TextBox implements Updateable, GuiElement{
         this.index = 0;
         this.done = false;
         this.lastTime = System.currentTimeMillis();
+        this.lineNum = 0;
+        
+        textarray = new ArrayList<String>();
+        splittext();
     }
     
     public TextBox(Vector2 centerlocation, Vector2 dimentions, int background,
@@ -81,13 +88,34 @@ public class TextBox implements Updateable, GuiElement{
         this.index = 0;
         this.done = false;
         this.lastTime = System.currentTimeMillis();
+        this.lineNum = 0;
+        textarray = new ArrayList<String>();
+        splittext();
+    }
+    
+    private void splittext(){
+        String remain = this.text;
+        while(true){
+            if(!remain.contains("\n")){
+                textarray.add(remain);
+                break;
+            }
+            String sub = remain.substring(0,remain.indexOf('\n'));
+            textarray.add(sub);
+            remain = remain.substring(remain.indexOf('\n')+1);
+        }
     }
     
     @Override
     public void update() {
         if(!done){
-            if(index >= text.length()){
-                done = true;
+            if(lineNum >= this.textarray.size()){
+                done = true; 
+                return;
+            }
+            if(index >= this.textarray.get(lineNum).length()){
+                lineNum += 1;
+                index = 0;
             }
             
             long now = System.currentTimeMillis();
@@ -105,8 +133,8 @@ public class TextBox implements Updateable, GuiElement{
         Vector2 mov = this.dimentions.clone();
         mov.scalarMultiply(0.5);
         pos.subtract(mov);
+        Vector2 innerpos = pos.clone();
         if(this.outline){
-            Vector2 innerpos = pos.clone();
             innerpos.dX(this.outlineThickness);
             innerpos.dY(this.outlineThickness);
             Vector2 innerdim = this.dimentions.clone();
@@ -117,13 +145,18 @@ public class TextBox implements Updateable, GuiElement{
             batch.fillRect(innerpos, (int)innerdim.getX(), (int)innerdim.getY(), background, depth+1);
             innerpos.dY(12);
             innerpos.dX(5);
-            batch.DrawString(innerpos, text.substring(0, index), this.textColor, depth+2, fonttype, fontstyle, textsize);
         }else{
-            Vector2 innerpos = pos.clone();
             batch.fillRect(pos, (int)mov.getX(), (int)mov.getY(), this.outlinecolor, depth);
             innerpos.dY(6);
             innerpos.dX(5);
-            batch.DrawString(innerpos, text.substring(0,index), this.textColor, depth+1, fonttype, fontstyle, textsize);
+        }
+        for(int i=0; i<this.textarray.size(); i++){
+            if(i > 0){ innerpos.dY((this.textsize+2));}//move the text down a line...
+            if(i == lineNum){
+                batch.DrawString(innerpos, textarray.get(i).substring(0, index), this.textColor, depth+2, fonttype, fontstyle, textsize);
+            }else if(i < lineNum){
+                batch.DrawString(innerpos, textarray.get(i), this.textColor, depth+2, fonttype, fontstyle, textsize);
+            }
         }
     }
     

@@ -119,6 +119,14 @@ public class Level {
         return lights;
     }
     
+    public ArrayList<Image2D> getUpdateableWallsFloorCeil(){
+        ArrayList<Image2D> updateable = new ArrayList<Image2D>();
+        updateable.addAll(this.ceilingsprites.values());
+        updateable.addAll(this.floorsprites.values());
+        updateable.addAll(this.wallsprites.values());
+        return updateable;
+    }
+    
     public String printStatus(){
         String s ="{Num Wall Sprites: "+wallsprites.size()+", Num Ceil Sprites: "
                 +this.ceilingsprites.size()+", Num Floor Sprites: "+this.floorsprites.size()

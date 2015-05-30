@@ -3,9 +3,12 @@ from PythonBeans import Lighting
 from Utilities import Vector2
 from Utilities import KeyBoard
 from Game import Player
+from Game import TextBox
 
 from Game import Pathfinding
 from Game import Sprite
+
+from Sound import SoundPlayer
 
 #from Misc import LightEnemy
 
@@ -45,7 +48,8 @@ stuff = [
 
 level.setWalls(stuff)
 level.putWallSprite(1,"HelloWorldMod/sprites/eagle.png")
-level.putWallSprite(2,"HelloWorldMod/sprites/redbrick.png")
+#level.putWallSprite(2,"HelloWorldMod/sprites/redbrick.png")
+level.putWallSprite(2,["HelloWorldMod/sprites/redbrick.png","HelloWorldMod/sprites/purplestone.png","HelloWorldMod/sprites/mossy.png"],150)
 level.putWallSprite(3,"HelloWorldMod/sprites/purplestone.png")
 level.putWallSprite(4,"HelloWorldMod/sprites/greystone.png")
 level.putWallSprite(5,"HelloWorldMod/sprites/bluestone.png")
@@ -119,18 +123,18 @@ light2 = Lighting(Vector2(20.5,11.5),0xFFFFFF,3,player.getDir().clone(),player.g
 level.addLighting(light2)
 
 path = Pathfinding.getPath(Vector2(1,1),Vector2(21,12),level)
-for x in path:
-    print x
+#for x in path:
+    #print x
 
 
-level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(20.5,11.5),0xFFFFFF,False))
-level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(18.5,4.5),0xFFFFFF,False))
-level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(10,4.5),0xFFFFFF,False))
-level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(10,12.5),0xFFFFFF,False))
-level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(3.5,6.5),0xFFFFFF,False))
-level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(3.5,20.5),0xFFFFFF,False))
-level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(3.5,14.5),0xFFFFFF,False))
-level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(14.5,20.5),0xFFFFFF,False))
+level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(20.5,11.5),0x000000,False))
+level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(18.5,4.5),0x000000,False))
+level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(10,4.5),0x000000,False))
+level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(10,12.5),0x000000,False))
+level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(3.5,6.5),0x000000,False))
+level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(3.5,20.5),0x000000,False))
+level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(3.5,14.5),0x000000,False))
+level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(14.5,20.5),0x000000,False))
 
 
 level.addLighting(Lighting(Vector2(18.5,4.5),0xFFFFFF,2,Vector2(),0.0,Lighting.LightingType.ambient,0.5))
@@ -141,20 +145,28 @@ level.addLighting(Lighting(Vector2(3.5,20.5),0xFFFFFF,2,Vector2(),0.0,Lighting.L
 level.addLighting(Lighting(Vector2(3.5,14.5),0xFFFFFF,2,Vector2(),0.0,Lighting.LightingType.ambient,0.5))
 level.addLighting(Lighting(Vector2(14.5,20.5),0xFFFFFF,2,Vector2(),0.0,Lighting.LightingType.ambient,0.5))
 
-level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(21.5,1.5),0xFFFFFF,True))
-level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(15.5,1.5),0xFFFFFF,True))
-level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(16,1.8),0xFFFFFF,True))
-level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(16.2,1.2),0xFFFFFF,True))
-level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(3.5,2.5),0xFFFFFF,True))
-level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(9.5,15.5),0xFFFFFF,True))
-level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(10,15.1),0xFFFFFF,True))
-level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(10.5,15.8),0xFFFFFF,True))
+level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(21.5,1.5),0x000000,True))
+level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(15.5,1.5),0x000000,True))
+level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(16,1.8),0x000000,True))
+level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(16.2,1.2),0x000000,True))
+level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(3.5,2.5),0x000000,True))
+level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(9.5,15.5),0x000000,True))
+level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(10,15.1),0x000000,True))
+level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(10.5,15.8),0x000000,True))
 
 kcontrol = KeyboardCont(keyboard,maingame)
 maingame.addUpdateable(kcontrol)
 
+#textbox = TextBox(Vector2(400,200),Vector2(750,100),0xFFFFFF,"Welcome to HelloWorldDemo Mod!",0,0,0x000000,500,13,5,0x00FF00,1000);
+#maingame.addUpdateable(textbox)
+#maingame.addGuiElement(textbox)
+
 maingame.giveLevel(level)
 player.setPos(Vector2(22,11.5))
+
+#musak = SoundPlayer("HelloWorldMod/music/Enochian_Magic.mp3")
+#musak.start()
+maingame.addSound("HelloWorldMod/music/Enochian_Magic.mp3")
 
 #lightEnemy = LightEnemy(Vector2(1,1),Vector2(0,1),2,2,0xFFFFFF,3)
 #lightEnemy.moveTo(player.getPos().clone(),level)

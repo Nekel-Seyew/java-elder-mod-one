@@ -24,7 +24,7 @@ public class PathfindingFib {
             return null;
         }
         
-        ArrayList<Vector2> path = new ArrayList<Vector2>();
+        ArrayList<Vector2> path;
         Entry<Node>[][] neighbors = new Entry[level.walls[0].length][level.walls.length];
         FibonacciHeap<Node> Q = new FibonacciHeap<Node>();
         

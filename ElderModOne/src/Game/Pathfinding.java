@@ -6,11 +6,9 @@
 
 package Game;
 
-import Misc.FibonacciHeap;
 import Utilities.Vector2;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.PriorityQueue;
 import java.util.Stack;
 
 /**
@@ -24,7 +22,7 @@ public class Pathfinding {
             return null;
         }
         
-        ArrayList<Vector2> path = new ArrayList<Vector2>();
+        ArrayList<Vector2> path;
         Node[][] neighbors = new Node[level.walls[0].length][level.walls.length];
         
         ArrayList<Node> Q = new ArrayList<Node>();

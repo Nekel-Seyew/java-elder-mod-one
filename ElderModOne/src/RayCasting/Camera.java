@@ -11,46 +11,41 @@ import Game.Player;
 import Hardware_Accelerated.AccelGame;
 import PythonBeans.Drawable;
 import PythonBeans.Lighting;
-import Utilities.Image2D;
 import Utilities.ImageCollection;
-import Utilities.Rect;
 import Utilities.Vector2;
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.ForkJoinPool;
-import org.python.modules.math;
 
 /**
  *
  * @author KyleSweeney
  */
 public class Camera {
-
-    Vector2 nullVector = new Vector2(0, 0);
     //Vector2 plane = new Vector2(0, 0.66);
-    Vector2 resolution = new Vector2();
-    CameraRender r;
-    ForkJoinPool pool;
-    double[] zBuffer;
+    private Vector2 resolution = new Vector2();
+    private CameraRender r;
+    private ForkJoinPool pool;
+    //double[] zBuffer;
     
-    BufferedImage sceneOld;
-    int[] bufferA, bufferB;
+    //BufferedImage sceneOld;
+    private int[] buffer;
     
     //share resources, and don't do more work than you need to do.
-    HashMap<Integer, Integer> colorHashMap;
+    private HashMap<Integer, Integer> colorHashMap;
+    private Drawable[] sortHelper;
 
     public Camera(Vector2 resolution) {
-        this.nullVector = new Vector2(0, 0);
+        //this.nullVector = new Vector2(0, 0);
         //this.plane = new Vector2(0, 0.66);
         this.resolution = resolution;
         colorHashMap = new HashMap<Integer,Integer>(64,0.2f);
         r = new CameraRender(0,(int)resolution.getX(),null,null,null,resolution,(int)resolution.getX()/4);
         pool = new ForkJoinPool();
         //sceneOld = new BufferedImage((int)resolution.getX(), (int)resolution.getY(), BufferedImage.TYPE_INT_ARGB);
-        bufferA = new int[(int)resolution.getX() * (int)resolution.getY()];
+        buffer = new int[(int)resolution.getX() * (int)resolution.getY()];
+        sortHelper = new Drawable[10];
     }
 
     /*
@@ -63,7 +58,7 @@ public class Camera {
     */
     public void render(Level level, Player player, ImageCollection batch) {
         BufferedImage scene = new BufferedImage((int)resolution.getX(), (int)resolution.getY(), BufferedImage.TYPE_INT_ARGB);
-        int[] buffer = bufferA;
+        int[] buffer = this.buffer;
         //generate the plane vector
         
         for(int i=0; i<buffer.length; i++){
@@ -95,31 +90,35 @@ public class Camera {
         
         double invDet = 1.0/(plane.getX()*playerDirY - plane.getY()*playerDirX);
         
-        ArrayList<InnerSprite> msprites = new ArrayList<InnerSprite>(sprites.size());
-        for(Drawable d : sprites){
-            msprites.add(new InnerSprite(d,player.getPos()));
+//        ArrayList<InnerSprite> msprites = new ArrayList<InnerSprite>(sprites.size());
+//        for(Drawable d : sprites){
+//            msprites.add(new InnerSprite(d,player.getPos()));
+//        }
+//        Collections.sort(msprites);
+        if(this.sortHelper.length < sprites.size()){
+            this.sortHelper = new Drawable[(sprites.size())];
         }
-        Collections.sort(msprites);
+        qSortSprites(sprites,this.sortHelper,player.getPos(),0,sprites.size()-1);
 //        System.out.println("Starting to draw sprites");
 //        System.out.println("msprites size: "+msprites.size());
-        for(InnerSprite sprite : msprites){
-            double spriteX = sprite.location.getX() - player.getPos().getX();
-            double spriteY = sprite.location.getY() - player.getPos().getY();
+        for(Drawable sprite : sprites){
+            double spriteX = sprite.getPosition().getX() - player.getPos().getX();
+            double spriteY = sprite.getPosition().getY() - player.getPos().getY();
             
             double transformX = invDet * (playerDirY * spriteX - playerDirX * spriteY);
             double transformY = invDet * (-plane.getY() * spriteX + plane.getX()*spriteY);
             
             int spriteScreenX = (int)(resolution.getX()/2 * (1 + transformX/transformY));
             
-            int vMoveScreen = (int)(sprite.verticalMove/transformY);
-            int spriteHeight = (int)(Math.abs((int)(h/transformY)) / (1/sprite.scale.getY()));
+            int vMoveScreen = (int)(sprite.getVerticalMove()/transformY);
+            int spriteHeight = (int)(Math.abs((int)(h/transformY)) / (1/sprite.getScale().getY()));
             
             int drawStartY = (h>>1) - (spriteHeight>>1) + vMoveScreen;
             if(drawStartY < 0) drawStartY =0;
             int drawEndY = (h>>1) + (spriteHeight>>1) + vMoveScreen;
             if(drawEndY >= h) drawEndY=h-1;
             
-            int spriteWidth = (int)(Math.abs((int)(h / transformY)) / (1/sprite.scale.getX()));
+            int spriteWidth = (int)(Math.abs((int)(h / transformY)) / (1/sprite.getScale().getX()));
             int drawStartX = spriteScreenX - (spriteWidth>>1);
             if(spriteWidth < 0 ) drawStartX =0;
             int drawEndX = spriteScreenX + (spriteWidth>>1);
@@ -128,19 +127,19 @@ public class Camera {
 //            ArrayList<Lighting> lights = level.getLightsAtLocation(sprite.location);
             
             ArrayList<Lighting> lights = new ArrayList<Lighting>();//empty list
-            if(sprite.shouldShade){
-                lights = level.getLightsAtLocation(sprite.location);
+            if(sprite.doShade()){
+                lights = level.getLightsAtLocation(sprite.getPosition());
             }
             for(int stripe = drawStartX; stripe < drawEndX; stripe++){
-                int texX = (int)(256 * (stripe - (spriteScreenX - (spriteWidth>>1))) * sprite.theSprite.getWidth()/spriteWidth) /256;
+                int texX = (int)(256 * (stripe - (spriteScreenX - (spriteWidth>>1))) * sprite.getSprite().getWidth()/spriteWidth) /256;
                 if((transformY > 0 && stripe > 0) && (stripe < resolution.getX() && transformY < depthBuffer[stripe] )){
                     for(int y = drawStartY; y < drawEndY; y++){
-                        int d = (y-(int)sprite.verticalMove) * 256 - h*128 + spriteHeight*128; //assume sprites are 64x64
-                        int texY = ((d * sprite.theSprite.getHeight())/spriteHeight)/256;
-                        int color = sprite.theSprite.getColor(Math.abs(texX), Math.abs(texY));
-                        if((color & sprite.invisColor) != sprite.invisColor){ //needs to be bitwise AND together because invisColor is only RGB and not ARGB
+                        int d = (y-(int)sprite.getVerticalMove()) * 256 - h*128 + spriteHeight*128; //assume sprites are 64x64
+                        int texY = ((d * sprite.getSprite().getHeight())/spriteHeight)/256;
+                        int color = sprite.getSprite().getColor(Math.abs(texX), Math.abs(texY));
+                        if((color & 0xFFFFFF) != sprite.invisibleColor()){ //needs to be bitwise AND together because invisColor is only RGB and not ARGB
                             for(Lighting light : lights){
-                                color = getColor(sprite.location.getX(),sprite.location.getY(),color,light);
+                                color = getColor(sprite.getPosition().getX(),sprite.getPosition().getY(),color,light);
                             }
                             buffer[y * (int) resolution.getX() + stripe] = color;
                         }
@@ -174,12 +173,6 @@ public class Camera {
             }
         }
         return arrayT;
-    }
-    
-    private void bufferSwap(){
-        int[] temp = this.bufferA;
-        this.bufferA=this.bufferB;
-        this.bufferB=temp;
     }
     
     public int getColor(double posX, double posY, int color, Lighting light) {
@@ -276,37 +269,80 @@ public class Camera {
         return finalColor;
     }
     
-    private class InnerSprite implements Comparable{
-
-        Image2D theSprite;
-        Vector2 location;
-        double distSquare;
-        double verticalMove;
-        Vector2 scale;
-        int invisColor;
-        boolean shouldShade;
-
-        public InnerSprite(Drawable sprite, Vector2 player) {
-            this.theSprite = sprite.getSprite();
-            this.location = sprite.getPosition();
-            this.verticalMove = sprite.getVerticalMove();
-            this.scale = sprite.getScale();
-            this.distSquare = player.distanceSquare(location);
-            this.invisColor=sprite.invisibleColor();
-            this.shouldShade=sprite.doShade();
+    private void qSortSprites(ArrayList<Drawable> sprites, Drawable[] helper, final Vector2 player, final int start, final int end){
+        if(start < end){
+            final int pivot = qSortHelper(sprites,helper,player,start,end);
+            qSortSprites(sprites,helper,player,start,pivot);
+            qSortSprites(sprites,helper,player,pivot+1,end);
         }
-        
-        @Override
-        public int compareTo(Object o) {
-            InnerSprite other = (InnerSprite)o;
-            if(this.distSquare < other.distSquare){
-                return 1;
-            }else if(this.distSquare > other.distSquare){
-                return -1;
-            }else{
-                return 0;
+    }
+    
+    private int qSortHelper(ArrayList<Drawable> sprites, Drawable[] helper, Vector2 player, int lo, int hi){
+        int pIndex = (int)(Math.random() * (hi-lo)) + lo;
+        double pValue = sprites.get(pIndex).getPosition().distanceSquare(player);
+        //swap
+        Drawable d = sprites.get(pIndex);
+        sprites.set(pIndex, sprites.get(hi));
+        sprites.set(hi, d);
+        int storeIndex = lo;
+        for(int i= lo; i < hi; i++){
+            if(sprites.get(i).getPosition().distanceSquare(player) > pValue){
+                //swap
+                d = sprites.get(i);
+                sprites.set(i, sprites.get(storeIndex));
+                sprites.set(storeIndex, d);
+                storeIndex +=1;
             }
         }
-        
+        //swap
+        d = sprites.get(hi);
+        sprites.set(hi, sprites.get(storeIndex));
+        sprites.set(storeIndex, d);
+        return storeIndex;
     }
+    
+    private void sortSprites(ArrayList<Drawable> sprites, Drawable[] helper, Vector2 player, int start, int end){
+        if(start == end) return;
+        if(end - start <=1) return;
+        int middle = start + (end - start)/2;
+        sortSprites(sprites, helper, player, start, middle);
+        sortSprites(sprites, helper, player, middle+1, end);
+        
+        int left = start, right = middle, k=0;
+        while(k < (end-start)){
+            if (left < middle && right < end) {
+                //feels backwards because in reality, we want it largest first, smallest last.
+                if (sprites.get(left).getPosition().distanceSquare(player) >= sprites.get(right).getPosition().distanceSquare(player)) {
+                    helper[k + start]= sprites.get(left);
+                    left += 1;
+                    k += 1;
+                } else {
+                    helper[(k + start)] = sprites.get(right);
+                    right += 1;
+                    k += 1;
+                }
+            } else if (left < middle) {
+                helper[(k + start)] = sprites.get(left);
+                left += 1;
+                k += 1;
+            } else {
+                helper[(k + start)] = sprites.get(right);
+                right += 1;
+                k += 1;
+            }
+        }
+        for(k=start; k < end; k++){
+            sprites.set(k, helper[k]);
+        }
+    }
+
+    public Vector2 getResolution() {
+        return resolution;
+    }
+
+    public HashMap<Integer, Integer> getColorHashMap() {
+        return colorHashMap;
+    }
+    
+    
 }

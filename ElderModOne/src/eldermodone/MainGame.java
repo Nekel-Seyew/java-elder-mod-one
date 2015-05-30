@@ -7,19 +7,19 @@
 package eldermodone;
 
 import Game.Level;
-import Game.Pathfinding;
-import Game.PathfindingFib;
 import Game.Player;
 import Hardware_Accelerated.AGame;
 import Hardware_Accelerated.AccelGame;
+import PythonBeans.AnimatedCell;
 import PythonBeans.Drawable;
 import PythonBeans.GuiElement;
 import PythonBeans.Updateable;
 import RayCasting.Camera;
+import Sound.SoundBatch;
+import Sound.SoundFile;
 import Utilities.Image2D;
 import Utilities.ImageCollection;
 import Utilities.KeyBoard;
-import Utilities.Mouse;
 import Utilities.Vector2;
 import java.awt.AWTException;
 import java.awt.Color;
@@ -35,12 +35,13 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import javazoom.jl.decoder.JavaLayerException;
 import org.python.core.PyCode;
 import org.python.util.PythonInterpreter;
 
@@ -69,6 +70,7 @@ public class MainGame extends AGame{
     ArrayList<Updateable> updateObjects;
     ArrayList<Drawable> drawObjects;
     ArrayList<GuiElement> guiElements;
+    SoundBatch soundBatch;
     
     private boolean recomputeColor=true;
     
@@ -83,24 +85,18 @@ public class MainGame extends AGame{
         drawObjects = new ArrayList<Drawable>();
         player = new Player(new Vector2(),new Vector2(-1,0),(float)Math.PI/3);
         guiElements = new ArrayList<GuiElement>();
-//        player = new Player(new Vector2(22,11.5), new Vector2(-1,0), (float)Math.PI/3);
-//        camera = new Camera(new Vector2(640,480));
-//        camera = new Camera(new Vector2(800,600));
-//        camera = new Camera(new Vector2(320,200));
-//        camera = new Camera(new Vector2(1360,768));
-//        camera = new Camera(new Vector2(1680,1050));
+        soundBatch = new SoundBatch();
         
         //load mod
         try {
             pyInterp = new PythonInterpreter();
             pyInterp.set("player", player);
             pyInterp.set("maingame", this);
-            pyInterp.set("keyboard",this.keyboard);
+            pyInterp.set("keyboard", this.keyboard);
             pyInterp.exec("import sys");
         } 
-        catch(Exception e){
+        catch (Exception e) {
             e.printStackTrace();
-        }finally {
         }
 //        this.setBackgroundColor(Color.red);
         
@@ -120,6 +116,7 @@ public class MainGame extends AGame{
     @Override
     public void Update() {
         if(first){
+            soundBatch.start();
             mr = new mouseRobot();
             AccelGame.gui.addMouseMotionListener(mr);
             first=false;
@@ -143,6 +140,11 @@ public class MainGame extends AGame{
         
         for(int i=0; i<updateObjects.size(); i++){
             updateObjects.get(i).update();
+        }
+        for(Image2D wallsprite : this.level.getUpdateableWallsFloorCeil()){
+            if(wallsprite instanceof AnimatedCell){
+                ((AnimatedCell)wallsprite).update();
+            }
         }
         
         
@@ -215,9 +217,9 @@ public class MainGame extends AGame{
         return pyInterp;
     }
     
-    public void recomputerColor(){
-        recomputeColor=true;
-    }
+//    public void recomputerColor(){
+//        recomputeColor=true;
+//    }
     public void captureMouse(boolean onoff){
         this.captureMouse=onoff;
     }
@@ -227,6 +229,18 @@ public class MainGame extends AGame{
     }
     public void removeGuiElement(GuiElement img){
         this.guiElements.remove(img);
+    }
+    
+    public SoundFile addSound(String sound){
+        SoundFile sf = new SoundFile(sound);
+        soundBatch.addSound(sf);
+        return sf;
+    }
+    public void addSound(SoundFile sf){
+        soundBatch.addSound(sf);
+    }
+    public SoundBatch getSoundBatch(){
+        return soundBatch;
     }
     
     public Level getLevel(){
@@ -268,7 +282,6 @@ public class MainGame extends AGame{
     private class mouseRobot implements MouseMotionListener{
         
         Robot robot;
-        Mouse m = Mouse.getCurrentInstance();
         
         public mouseRobot(){
             super();
@@ -288,8 +301,6 @@ public class MainGame extends AGame{
         public void mouseMoved(MouseEvent e) {
             if (captureMouse) {
                 double dx = AccelGame.gui.getWidth() / 2 - e.getX();
-                double dy = AccelGame.gui.getHeight() / 2 - e.getY();
-//            System.out.println("dx: "+dx);
                 if (dx < 0) {
                     player.rotateAmount(dx / (2 * Math.PI));
                 }

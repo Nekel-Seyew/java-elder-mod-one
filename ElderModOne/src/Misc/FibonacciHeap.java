@@ -303,8 +303,9 @@ public final class FibonacciHeap<T> {
          * list is empty or while the current element isn't the first element
          * of that list.
          */
-        for (Entry<T> curr = mMin; toVisit.isEmpty() || toVisit.get(0) != curr; curr = curr.mNext)
+        for (Entry<T> curr = mMin; toVisit.isEmpty() || toVisit.get(0) != curr; curr = curr.mNext){
             toVisit.add(curr);
+        }
 
         /* Traverse this list and perform the appropriate unioning steps. */
         for (Entry<T> curr: toVisit) {
@@ -569,11 +570,11 @@ public final class FibonacciHeap<T> {
         /* Mark the parent and recursively cut it if it's already been
          * marked.
          */
-        if (entry.mParent.mIsMarked)
+        if (entry.mParent.mIsMarked){
             cutNode(entry.mParent);
-        else
+        }else{
             entry.mParent.mIsMarked = true;
-
+        }
         /* Clear the relocated node's parent; it's now a root. */
         entry.mParent = null;
     }

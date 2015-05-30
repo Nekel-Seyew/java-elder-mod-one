@@ -29,7 +29,7 @@ public class ElderModOne {
                 for(File p : children){
                     if(p.getName().contains("__init__.py")){
                         mods.add(f);
-                        System.out.println("Module name: "+f.getName());
+                        //System.out.println("Module name: "+f.getName());
                         break;
                     }
                 }
@@ -46,6 +46,7 @@ public class ElderModOne {
             Scanner reader = new Scanner(modListFile);
             while(reader.hasNext()){
                 String s = reader.nextLine();
+                if(s.startsWith("#")) continue;
                 data.add(s);
             }
         }catch(FileNotFoundException fnfe){

@@ -18,7 +18,6 @@ public class Sprite implements Drawable{
     
     Image2D theSprite;
     Vector2 location;
-    double distSquare;
     double verticalMove;
     Vector2 scale;
     int invisColor;

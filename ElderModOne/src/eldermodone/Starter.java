@@ -295,17 +295,17 @@ public class Starter extends javax.swing.JFrame {
        
        if(FullScreenWindowGroup.getSelection() == FullscreenRadio.getModel()){
            fullscreen=true;
-           System.out.println("FullScreen!");
+           Console.inst.println("FullScreen!");
        }else{
            fullscreen=false;
-           System.out.println("Windowed");
+           Console.inst.println("Windowed");
        }
        if(GraphicsRadioGroup.getSelection() == OpenGLRadio.getModel()){
            System.setProperty("sun.java2d.opengl","True");
-           System.out.println("OpenGL");
+          Console.inst.println("OpenGL");
        }else{
            System.setProperty("sun.java2d.d3d","True");
-           System.out.println("DirectX");
+           Console.inst.println("DirectX");
        }
        
        ButtonModel quality = QualityGroup.getSelection();
@@ -330,8 +330,8 @@ public class Starter extends javax.swing.JFrame {
        resolutionx = Integer.parseInt(s.substring(0,s.indexOf('x')));
        resolutiony = Integer.parseInt(s.substring(s.indexOf("x")+1));
        
-        System.out.println("resx: "+resolutionx);
-        System.out.println("resy: "+resolutiony);
+        Console.inst.println("resx: "+resolutionx);
+        Console.inst.println("resy: "+resolutiony);
        
        maingame.setCamera(w, h, resolutionx, resolutiony, fullscreen);
        

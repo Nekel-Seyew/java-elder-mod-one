@@ -73,9 +73,10 @@ public class Enemy implements Updateable{
             path = Pathfinding.getPath(pos, target, l);
             pathIndex=0;
             for(Vector2 x : path){
-                x.setX(x.getX()+0.5);
-                x.setY(x.getY()+0.5);
-                System.out.println(x);
+                if(x != null){
+                    x.setX(x.getX()+0.5);
+                    x.setY(x.getY()+0.5);
+                }
             }
             this.target.setX(((int)this.target.getX()) +0.5);
             this.target.setY(((int)this.target.getY()) +0.5);

@@ -13,3 +13,5 @@ class KeyboardCont(Updateable):
 		if self.keyboard.isKeyDown(KeyEvent.VK_ESCAPE) and not self.escapeOn:
 			self.maingame.captureMouse(self.escape)
 			self.escape = not self.escape
+		if self.keyboard.isKeyDown('p'):
+			self.maingame.addSound("HelloWorldMod/music/A-Tone.mp3")

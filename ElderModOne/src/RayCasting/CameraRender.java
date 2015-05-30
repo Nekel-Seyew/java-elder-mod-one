@@ -17,15 +17,18 @@ import java.util.HashMap;
 import java.util.concurrent.RecursiveAction;
 
 /**
- *
+ * A worker class which actually draws a portion of the screen's walls,
+ * ceiling, and floor.
+ * <br></br>
+ * IMPORTANT NOTE: YOU MUST CALL UPDATE BEFORE THE POOL INVOKES THIS CLASS.
  * @author KyleSweeney
  */
 public class CameraRender extends RecursiveAction {
 
     int start, end;
     int[] dest;
-    Player player;
-    Level level;
+    transient Player player;
+    transient Level level;
     Vector2 resolution;
     long threshold;
     double[] depthBuffer;
@@ -36,6 +39,7 @@ public class CameraRender extends RecursiveAction {
 
     public CameraRender(int start, int end, int[] dest, Player player, 
             Level level, Vector2 resolution, long threshold) {
+        super();
         this.start = start;
         this.end = end;
         this.dest = dest;
@@ -44,7 +48,7 @@ public class CameraRender extends RecursiveAction {
         this.resolution = resolution;
         this.threshold = threshold;
         if (!(end - start < threshold)) {
-            int split = (end + start) / 2;
+            final int split = (end + start) / 2;
             A = new CameraRender(start, split, dest, player, level, resolution, threshold);
             B = new CameraRender(split, end, dest, player, level, resolution, threshold);
         }
@@ -63,16 +67,16 @@ public class CameraRender extends RecursiveAction {
         this.resolution = resolution;
         this.threshold = threshold;
         this.depthBuffer=depthBuffer;
-        if (A != null && B !=null) {
-            int split = (end + start) / 2;
+        if (A != null && B != null) {
+            final int split = (end + start) / 2;
             A.update(start, split, dest,depthBuffer, player, level, resolution, threshold);
             B.update(split, end, dest,depthBuffer, player, level, resolution, threshold);
         }
     }
     
-    public native void render(int start, int end, int[] dest, double[] depthBuffer,
-            double playerPosX, double playerPosY, double playerDirX,double playerDirY,
-            Level level, int h, int y);
+//    public native void render(int start, int end, int[] dest, double[] depthBuffer,
+//            double playerPosX, double playerPosY, double playerDirX,double playerDirY,
+//            Level level, int h, int y);
 
     private void render() {
         Vector2 plane = player.getDir().clone();
@@ -404,9 +408,9 @@ public class CameraRender extends RecursiveAction {
 
         return finalColor;
     }
-    private double acos( double x) {
-        return (-0.69813170079773212 * x * x - 0.87266462599716477) * x + 1.5707963267948966;
-    }
+//    private double acos( double x) {
+//        return (-0.69813170079773212 * x * x - 0.87266462599716477) * x + 1.5707963267948966;
+//    }
     //we can get away with this since when creating the light, we normalize the length of the direction vector
     private double theta(Vector2 lightToPix, Vector2 ligthDir){
         return AMath.acos(lightToPix.dotProduct(ligthDir)/lightToPix.length());

@@ -8,6 +8,7 @@ package PythonBeans;
 
 import Utilities.Image2D;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  *
@@ -30,11 +31,6 @@ public class AnimatedCell extends Image2D{
     
     @Override
     public int getColor(int x, int y){
-        long timeNow = System.currentTimeMillis();
-        if(timeNow - lastTime > timeDiff){
-            i = i+1 >= frames.size() ? 0 : i+1;
-            lastTime = timeNow;
-        }
         return frames.get(i).getColor(x, y);
     }
     
@@ -49,6 +45,40 @@ public class AnimatedCell extends Image2D{
     @Override
     public int getWidth(){
         return frames.get(i).getWidth();
+    }
+    
+    public void update(){
+        long timeNow = System.currentTimeMillis();
+        if(timeNow - lastTime > timeDiff){
+            i = i+1 >= frames.size() ? 0 : i+1;
+            lastTime = timeNow;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.frames);
+        hash = 79 * hash + (int) (this.timeDiff ^ (this.timeDiff >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AnimatedCell other = (AnimatedCell) obj;
+        if (!Objects.equals(this.frames, other.frames)) {
+            return false;
+        }
+        if (this.timeDiff != other.timeDiff) {
+            return false;
+        }
+        return true;
     }
     
 }

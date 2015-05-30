@@ -23,7 +23,6 @@ public class AnimatedSprite implements Drawable{
     long time;
     
     Vector2 location;
-    double distSquare;
     double verticalMove;
     Vector2 scale;
     int invisColor;

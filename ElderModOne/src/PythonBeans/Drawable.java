@@ -7,9 +7,7 @@
 package PythonBeans;
 
 import Utilities.Image2D;
-import Utilities.ImageCollection;
 import Utilities.Vector2;
-import java.awt.Graphics2D;
 
 /**
  *

@@ -34,6 +34,8 @@ import org.python.util.PythonInterpreter;
  */
 public class Console extends javax.swing.JFrame {
 
+    public static Console inst;
+    
     PythonInterpreter pyInter;
     ConsoleOutputStream cos;
     ConsoleErrorStream ces;
@@ -57,6 +59,7 @@ public class Console extends javax.swing.JFrame {
         pyInter.setErr(cos);
         commands = new ArrayList<String>();
         pointer = 0;
+        inst = this;
     }
     
 
@@ -123,6 +126,9 @@ public class Console extends javax.swing.JFrame {
     private void inputKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputKeyPressed
         
         if(evt.getKeyChar() == '\n'){
+            if(!input.getText().contains(">>")){
+                 input.setText(">>");
+            }
             String text = input.getText().substring(2);
             Output.setText(Output.getText()+"\n>>"+text+"\n");
             try{
@@ -198,12 +204,28 @@ public class Console extends javax.swing.JFrame {
         });
     }
     
+    public void println(String s){
+        try {
+            this.cos.write('\n');
+        } catch (IOException ex) {
+            Logger.getLogger(Console.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        for(char c : s.toCharArray()){
+            try {
+                this.cos.write(c);
+            } catch (IOException ex) {
+                Logger.getLogger(Console.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     
     private class ConsoleOutputStream extends OutputStream{
 
         JTextPane consoleout;
         
         public ConsoleOutputStream(JTextPane jta){
+            super();
             consoleout = jta;
         }
         public void writeError(PyException e) throws IOException{
@@ -235,6 +257,7 @@ public class Console extends javax.swing.JFrame {
         JTextPane consoleout;
         
         public ConsoleErrorStream(JTextPane jta){
+            super();
             consoleout = jta;
         }
         

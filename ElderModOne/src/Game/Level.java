@@ -100,6 +100,9 @@ public class Level {
     public ArrayList<Drawable> getSprites(){
         return this.sprites;
     }
+    public void removeSprite(Drawable sprite){
+        this.sprites.remove(sprite);
+    }
     
     public void ensureSortedLights(){
         Collections.sort(lights);

@@ -143,7 +143,7 @@ public class Console extends javax.swing.JFrame {
             }
             input.setText(">>");
             this.commands.add(text);
-            this.pointer = commands.size();
+            this.pointer = commands.size()-1;
         }
         
         if(evt.getKeyCode() == KeyEvent.VK_UP){

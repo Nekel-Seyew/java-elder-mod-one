@@ -10,6 +10,7 @@ import Game.Level;
 import Game.Player;
 import Hardware_Accelerated.AGame;
 import Hardware_Accelerated.AccelGame;
+import Misc.UpdaterThread;
 import PythonBeans.AnimatedCell;
 import PythonBeans.Drawable;
 import PythonBeans.GuiElement;
@@ -27,6 +28,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -40,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Logger;
 import javazoom.jl.decoder.JavaLayerException;
 import org.python.core.PyCode;
@@ -76,7 +79,8 @@ public class MainGame extends AGame{
     
     private boolean captureMouse;
     
-    
+    UpdaterThread updaterthread;
+    ForkJoinPool updatePool;
     
     @Override
     public void InitializeAndLoad() {
@@ -86,6 +90,8 @@ public class MainGame extends AGame{
         player = new Player(new Vector2(),new Vector2(-1,0),(float)Math.PI/3);
         guiElements = new ArrayList<GuiElement>();
         soundBatch = new SoundBatch();
+        updaterthread = new UpdaterThread(player,updateObjects,level,keyboard);
+        updatePool = new ForkJoinPool();
         
         //load mod
         try {
@@ -120,6 +126,7 @@ public class MainGame extends AGame{
             mr = new mouseRobot();
             AccelGame.gui.addMouseMotionListener(mr);
             first=false;
+            //updaterthread.start();
             
             AccelGame.frame.addWindowListener(new WindowAdapter(){
                 @Override
@@ -129,6 +136,14 @@ public class MainGame extends AGame{
                     System.out.println("Average fps: "+fps);
                 }
             });
+            Rectangle r =AccelGame.frame.getBounds();
+            
+            //AccelGame.frame.getWidth();
+            this.v.setHeight(AccelGame.gui.getHeight());
+            this.v.setWidth(AccelGame.gui.getWidth());
+            this.GAME_HEIGHT=AccelGame.gui.getHeight();
+            this.GAME_WIDTH=AccelGame.gui.getWidth();
+            
 //            AccelGame.frame.setSize(1360, 768);
 //            AccelGame.frame.setSize(1680,1050);
             
@@ -137,38 +152,39 @@ public class MainGame extends AGame{
 //            GraphicsDevice gd = ge.getDefaultScreenDevice();
 //            gd.setFullScreenWindow(AccelGame.frame);
         }
-        
-        for(int i=0; i<updateObjects.size(); i++){
-            updateObjects.get(i).update();
-        }
-        for(Image2D wallsprite : this.level.getUpdateableWallsFloorCeil()){
-            if(wallsprite instanceof AnimatedCell){
-                ((AnimatedCell)wallsprite).update();
-            }
-        }
-        
-        
-        if(keyboard.isKeyDown(KeyBoard.a)){
-            player.left();
-        }
-        if(keyboard.isKeyDown(KeyBoard.d)){
-            player.right();
-        }
-        if(keyboard.isKeyDown(KeyBoard.s)||keyboard.isKeyDown(KeyEvent.VK_DOWN)){
-            player.backwards();
-        }
-        if(keyboard.isKeyDown(KeyBoard.w) || keyboard.isKeyDown(KeyEvent.VK_UP)){
-            player.forward();
-        }
-        if(keyboard.isKeyDown(KeyEvent.VK_LEFT)){
-            player.rotateLeft();
-        }
-        if(keyboard.isKeyDown(KeyEvent.VK_RIGHT)){
-            player.rotateRight();
-        }
-        
-        //do moving and turning and whatever else the player needs updating
-        player.update(level);
+        updaterthread.beginUpdate();
+        updatePool.invoke(updaterthread);
+//        for(int i=0; i<updateObjects.size(); i++){
+//            updateObjects.get(i).update();
+//        }
+//        for(Image2D wallsprite : this.level.getUpdateableWallsFloorCeil()){
+//            if(wallsprite instanceof AnimatedCell){
+//                ((AnimatedCell)wallsprite).update();
+//            }
+//        }
+//        
+//        
+//        if(keyboard.isKeyDown(KeyBoard.a)){
+//            player.left();
+//        }
+//        if(keyboard.isKeyDown(KeyBoard.d)){
+//            player.right();
+//        }
+//        if(keyboard.isKeyDown(KeyBoard.s)||keyboard.isKeyDown(KeyEvent.VK_DOWN)){
+//            player.backwards();
+//        }
+//        if(keyboard.isKeyDown(KeyBoard.w) || keyboard.isKeyDown(KeyEvent.VK_UP)){
+//            player.forward();
+//        }
+//        if(keyboard.isKeyDown(KeyEvent.VK_LEFT)){
+//            player.rotateLeft();
+//        }
+//        if(keyboard.isKeyDown(KeyEvent.VK_RIGHT)){
+//            player.rotateRight();
+//        }
+//        
+//        //do moving and turning and whatever else the player needs updating
+//        player.update(level);
         
         //frame rate counting
         long timeNow = System.currentTimeMillis();
@@ -192,6 +208,7 @@ public class MainGame extends AGame{
     
     public void giveLevel(Level l){
         this.level = l;
+        this.updaterthread.setLevel(l);
     }
     
     public void addUpdateable(Updateable u){
@@ -247,6 +264,10 @@ public class MainGame extends AGame{
         return this.level;
     }
     
+    public Player getPlayer(){
+        return this.player;
+    }
+    
     public void setCamera(int w, int h, int resolutionX, int resolutionY, boolean fullScreen){
         AccelGame.frame.setSize(resolutionX, resolutionY);
         camera = new Camera(new Vector2(w,h));
@@ -262,7 +283,8 @@ public class MainGame extends AGame{
     
     public void setCursorImage(String img){
         Toolkit tk=Toolkit.getDefaultToolkit();
-            AccelGame.gui.setCursor(tk.createCustomCursor(tk.createImage(img), new Point(AccelGame.gui.getX(),AccelGame.gui.getY()), "img"));
+            AccelGame.gui.setCursor(tk.createCustomCursor(tk.createImage(img), 
+                    new Point(AccelGame.gui.getX(),AccelGame.gui.getY()), "img"));
     }
     
     public void runMods(File[] modPackages){
@@ -279,6 +301,10 @@ public class MainGame extends AGame{
         }
     }
     
+    public double getFPS(){
+        return (ultCount)/((System.currentTimeMillis()-firstTime*1.0)/1000);
+    }
+    
     private class mouseRobot implements MouseMotionListener{
         
         Robot robot;
@@ -287,6 +313,7 @@ public class MainGame extends AGame{
             super();
             try {
                 robot = new Robot();
+                
             } catch (AWTException ex) {
                 Logger.getLogger(MainGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             }
@@ -294,7 +321,17 @@ public class MainGame extends AGame{
         
         @Override
         public void mouseDragged(MouseEvent e) {
-            
+            if (captureMouse) {
+                double dx = AccelGame.gui.getWidth() / 2 - e.getX();
+                if (dx < 0) {
+                    player.rotateAmount(dx / (2 * Math.PI));
+                }
+                if (dx > 0) {
+                    player.rotateAmount(dx / (2 * Math.PI));
+                }
+                robot.mouseMove((int) AccelGame.gui.getLocationOnScreen().getX() + AccelGame.gui.getWidth() / 2,
+                        (int) AccelGame.gui.getLocationOnScreen().getY() + AccelGame.gui.getHeight() / 2);
+            }
         }
 
         @Override

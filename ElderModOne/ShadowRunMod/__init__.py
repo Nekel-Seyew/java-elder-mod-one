@@ -51,7 +51,7 @@ level.addLighting(glowenemy.getLight())
 maingame.addUpdateable(glowenemy)
 level.addSprite(glowenemy.getDrawable())
 
-textbox = TextBox(Vector2(400,300),Vector2(750,100),0xFFFFFF,"Hello Decker...\nWelcome to The Grid.",0,0,0x000000,500,13,5,0x00FF00,1000);
+textbox = TextBox(Vector2(maingame.GAME_WIDTH/2,maingame.GAME_HEIGHT/2),Vector2(maingame.GAME_WIDTH*0.90,maingame.GAME_HEIGHT*0.1666),0xFFFFFF,"Hello Decker...\nWelcome to The Grid.",0,0,0x000000,500,13,5,0x00FF00,1000);
 maingame.addUpdateable(textbox)
 maingame.addGuiElement(textbox)
 

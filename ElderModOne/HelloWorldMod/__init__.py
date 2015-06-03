@@ -5,6 +5,8 @@ from Utilities import KeyBoard
 from Game import Player
 from Game import TextBox
 
+from java.util import ArrayList
+
 from Game import Pathfinding
 from Game import Sprite
 
@@ -13,10 +15,11 @@ from Sound import SoundPlayer
 #from Misc import LightEnemy
 
 from eldermodone import MainGame
-#import HelloWorldMod.KeyboardCont
 from LogicObjs import KeyboardCont
+from WorldObjs import Sword
+from Gui import UI
 
-print "Hello, world!"
+print "\nHello, world!"
 level = Level()
 #note, the vertical axis is your X, and the horizontal is the Y. Because yes.....
 stuff = [
@@ -116,11 +119,11 @@ stuff2 = [
 level.setCeil(stuff2)
 
 light = Lighting(Vector2(3,3),0x000000,10,Vector2(), 0.0, Lighting.LightingType.universal,0.5)
-print light.toString()
+#print light.toString()
 level.addLighting(light)
 
-light2 = Lighting(Vector2(20.5,11.5),0xFFFFFF,3,player.getDir().clone(),player.getFov()/4,Lighting.LightingType.directional,0.5)
-level.addLighting(light2)
+#light2 = Lighting(Vector2(20.5,11.5),0xFFFFFF,3,player.getDir().clone(),player.getFov()/4,Lighting.LightingType.directional,0.5)
+#level.addLighting(light2)
 
 path = Pathfinding.getPath(Vector2(1,1),Vector2(21,12),level)
 #for x in path:
@@ -154,6 +157,12 @@ level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(9.5,15.5),0x00
 level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(10,15.1),0x000000,True))
 level.addSprite(Sprite("HelloWorldMod/sprites/barrel.png",Vector2(10.5,15.8),0x000000,True))
 
+sword = Sword(Vector2(19,11.5),maingame)
+#level.addSprite(Sprite("HelloWorldMod/sprites/sword.png",Vector2(19,11.5),0xFFFFFF,False))
+level.addSprite(sword.getSprite())
+maingame.addUpdateable(sword)
+maingame.addGuiElement(sword)
+
 kcontrol = KeyboardCont(keyboard,maingame)
 maingame.addUpdateable(kcontrol)
 
@@ -161,12 +170,19 @@ maingame.addUpdateable(kcontrol)
 #maingame.addUpdateable(textbox)
 #maingame.addGuiElement(textbox)
 
+ui = UI(maingame)
+maingame.addUpdateable(ui)
+maingame.addGuiElement(ui)
+
 maingame.giveLevel(level)
 player.setPos(Vector2(22,11.5))
 
 #musak = SoundPlayer("HelloWorldMod/music/Enochian_Magic.mp3")
 #musak.start()
 maingame.addSound("HelloWorldMod/music/Enochian_Magic.mp3")
+
+player.setAttrib("weapons",ArrayList())
+player.setAttrib("health",100)
 
 #lightEnemy = LightEnemy(Vector2(1,1),Vector2(0,1),2,2,0xFFFFFF,3)
 #lightEnemy.moveTo(player.getPos().clone(),level)

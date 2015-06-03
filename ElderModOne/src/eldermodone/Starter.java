@@ -335,7 +335,6 @@ public class Starter extends javax.swing.JFrame {
        
        maingame.setCamera(w, h, resolutionx, resolutiony, fullscreen);
        
-       
        maingame.runMods(modListModel.getmods());
        AccelGame.frame.setVisible(true);
        

@@ -7,6 +7,7 @@ package Misc;
 import Game.Level;
 import Game.Player;
 import PythonBeans.AnimatedCell;
+import PythonBeans.TransparentCell;
 import PythonBeans.Updateable;
 import Utilities.Image2D;
 import Utilities.KeyBoard;
@@ -51,7 +52,7 @@ public class UpdaterThread extends RecursiveAction{
             updateObjects.get(i).update();
         }
         for (Image2D wallsprite : this.level.getUpdateableWallsFloorCeil()) {
-            if (wallsprite instanceof AnimatedCell) {
+            if (wallsprite instanceof AnimatedCell || wallsprite instanceof TransparentCell) {
                 ((AnimatedCell) wallsprite).update();
             }
         }

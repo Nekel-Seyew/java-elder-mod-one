@@ -10,6 +10,7 @@ import Advance.Matrix;
 import PythonBeans.AnimatedCell;
 import PythonBeans.Drawable;
 import PythonBeans.Lighting;
+import PythonBeans.TransparentCell;
 import Utilities.Image2D;
 import Utilities.Vector2;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class Level {
     private ArrayList<Lighting> lights;
     private ArrayList<Drawable> sprites;
     
+    private boolean haveTransparent;
     
     public Level(){
         wallsprites = new HashMap<Integer, Image2D>(20,0.2f);
@@ -43,6 +45,7 @@ public class Level {
         ceilingsprites = new HashMap<Integer, Image2D>(20,0.2f);
         lights = new ArrayList<Lighting>();
         sprites = new ArrayList<Drawable>();
+        haveTransparent = false;
     }
     
     public void putWallSprite(int i, String sprite){
@@ -50,6 +53,10 @@ public class Level {
     }
     public void putWallSprite(int i, String[] frames, long timediff){
         wallsprites.put(i, new AnimatedCell(frames,timediff));
+    }
+    public void putWallSprite(int i, TransparentCell tc){
+        wallsprites.put(i, tc);
+        this.haveTransparent=true;
     }
     public void putFloorSprite(int i, String sprite){
         floorsprites.put(i, new Image2D(sprite));
@@ -65,6 +72,9 @@ public class Level {
     }
     public boolean isWall(int x, int y){
         return wallsprites.containsKey(walls[y][x]);
+    }
+    public boolean isTransparentWall(int x, int y){
+        return (wallsprites.get(walls[y][x]) instanceof TransparentCell);
     }
     public Image2D getWallSprite(int mapX, int mapY) {
         return wallsprites.get(walls[mapY][mapX]);
@@ -106,6 +116,10 @@ public class Level {
     
     public void ensureSortedLights(){
         Collections.sort(lights);
+    }
+    
+    public boolean doesHaveTransparent(){
+        return this.haveTransparent;
     }
     
     public ArrayList<Lighting> getLightsAtLocation(Vector2 pos){

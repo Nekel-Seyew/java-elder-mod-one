@@ -6,6 +6,7 @@
 
 package Game;
 
+import PythonBeans.TransparentCell;
 import Utilities.Vector2;
 import java.util.Hashtable;
 
@@ -98,11 +99,38 @@ public class Player {
         if(doForward){
             if(!level.isWall((int)(pos.getX() +dir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY())) pos.dX(moveSpeed*dir.getX());
             if(!level.isWall((int)(pos.getX()), (int)(pos.getY() + dir.getY()*(moveSpeed*noColliFactor)))) pos.dY(moveSpeed*dir.getY());
+            
+            if(level.isTransparentWall((int)(pos.getX() +dir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY())){
+                TransparentCell tc = (TransparentCell)level.getWallSprite((int)(pos.getX() +dir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY());
+                if(tc.canGoThrough()){
+                    pos.dX(moveSpeed*dir.getX());
+                }
+            }
+            if(level.isTransparentWall((int)(pos.getX()), (int)(pos.getY() + dir.getY()*(moveSpeed*noColliFactor)))){
+                TransparentCell tc = (TransparentCell)level.getWallSprite((int)(pos.getX()), (int)(pos.getY() + dir.getY()*(moveSpeed*noColliFactor)));
+                if(tc.canGoThrough()){
+                    pos.dY(moveSpeed*dir.getY());
+                }
+            }
             doForward=false;
         }
         if(doBackward){
             if(!level.isWall((int)(pos.getX() -dir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY())) pos.dX( -(moveSpeed*dir.getX()));
             if(!level.isWall((int)(pos.getX()), (int)(pos.getY() - dir.getY()*(moveSpeed*noColliFactor)))) pos.dY(-(moveSpeed*dir.getY()));
+            
+            if(level.isTransparentWall((int)(pos.getX() -dir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY())){
+                TransparentCell tc = (TransparentCell)level.getWallSprite((int)(pos.getX() -dir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY());
+                if(tc.canGoThrough()){
+                    pos.dX( -(moveSpeed*dir.getX()));
+                }
+            }
+            if(level.isTransparentWall((int)(pos.getX()), (int)(pos.getY() - dir.getY()*(moveSpeed*noColliFactor)))){
+                TransparentCell tc = (TransparentCell)level.getWallSprite((int)(pos.getX()), (int)(pos.getY() - dir.getY()*(moveSpeed*noColliFactor)));
+                if(tc.canGoThrough()){
+                    pos.dY(-(moveSpeed*dir.getY()));
+                }
+            }
+            
             doBackward=false;
         }
         if(doRotateRight){
@@ -118,6 +146,19 @@ public class Player {
             rightDir.rotate(-Math.PI/2);
             if(!level.isWall((int)(pos.getX() +rightDir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY())) pos.dX(moveSpeed*rightDir.getX());
             if(!level.isWall((int)(pos.getX()), (int)(pos.getY() + rightDir.getY()*(moveSpeed*noColliFactor)))) pos.dY(moveSpeed*rightDir.getY());
+            
+            if(level.isTransparentWall((int)(pos.getX() +rightDir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY())){
+                TransparentCell tc = (TransparentCell)level.getWallSprite((int)(pos.getX() +rightDir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY());
+                if(tc.canGoThrough()){
+                    pos.dX(moveSpeed*rightDir.getX());
+                }
+            }
+            if(level.isTransparentWall((int)(pos.getX()), (int)(pos.getY() + rightDir.getY()*(moveSpeed*noColliFactor)))){
+                TransparentCell tc = (TransparentCell)level.getWallSprite((int)(pos.getX()), (int)(pos.getY() + rightDir.getY()*(moveSpeed*noColliFactor)));
+                if(tc.canGoThrough()){
+                    pos.dY(moveSpeed*rightDir.getY());
+                }
+            }
             doRight=false;
         }
         if(doLeft){
@@ -125,6 +166,19 @@ public class Player {
             leftDir.rotate(Math.PI/2);
             if(!level.isWall((int)(pos.getX() +leftDir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY())) pos.dX(moveSpeed*leftDir.getX());
             if(!level.isWall((int)(pos.getX()), (int)(pos.getY() + leftDir.getY()*(moveSpeed*noColliFactor)))) pos.dY(moveSpeed*leftDir.getY());
+            
+            if(level.isTransparentWall((int)(pos.getX() +leftDir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY())){
+                TransparentCell tc = (TransparentCell)level.getWallSprite((int)(pos.getX() +leftDir.getX()*(moveSpeed*noColliFactor)), (int)pos.getY());
+                if(tc.canGoThrough()){
+                    pos.dX(moveSpeed*leftDir.getX());
+                }
+            }
+            if(level.isTransparentWall((int)(pos.getX()), (int)(pos.getY() + leftDir.getY()*(moveSpeed*noColliFactor)))){
+                TransparentCell tc = (TransparentCell)level.getWallSprite((int)(pos.getX()), (int)(pos.getY() + leftDir.getY()*(moveSpeed*noColliFactor)));
+                if(tc.canGoThrough()){
+                    pos.dY(moveSpeed*leftDir.getY());
+                }
+            }
             doLeft=false;
         }
         if(doRotate){

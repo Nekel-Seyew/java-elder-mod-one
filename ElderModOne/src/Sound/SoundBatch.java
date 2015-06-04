@@ -18,7 +18,7 @@ public class SoundBatch extends Thread{
     ArrayList<SoundFile> sounds;
     
     public SoundBatch(){
-        super();
+        super("Sound Batch");
         sounds = new ArrayList<SoundFile>();
     }
     

@@ -19,6 +19,8 @@ public class AnimatedCell extends Image2D{
     long timeDiff;
     long lastTime;
     int i=0;
+    boolean stop;
+    boolean runOnce;
     
     public AnimatedCell(String[] frames, long timeDiff){
         this.frames = new ArrayList<Image2D>(frames.length);
@@ -27,6 +29,8 @@ public class AnimatedCell extends Image2D{
         }
         this.timeDiff=timeDiff;
         lastTime = System.currentTimeMillis();
+        stop = false;
+        runOnce = false;
     }
     
     @Override
@@ -48,12 +52,33 @@ public class AnimatedCell extends Image2D{
     }
     
     public void update(){
-        long timeNow = System.currentTimeMillis();
-        if(timeNow - lastTime > timeDiff){
-            i = i+1 >= frames.size() ? 0 : i+1;
-            lastTime = timeNow;
+        if (!stop) {
+            long timeNow = System.currentTimeMillis();
+            if (timeNow - lastTime > timeDiff) {
+                if(runOnce){
+                    i = i + 1 >= frames.size() ? i : i + 1;
+                    //stop = true;
+                    return;
+                }
+                i = i + 1 >= frames.size() ? 0 : i + 1;
+                lastTime = timeNow;
+            }
         }
     }
+    
+    public boolean onLastFrame(){
+        return i+1 == frames.size();
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
+    }
+
+    public void setRunOnce(boolean runOnce) {
+        this.runOnce = runOnce;
+    }
+    
+    
 
     @Override
     public int hashCode() {

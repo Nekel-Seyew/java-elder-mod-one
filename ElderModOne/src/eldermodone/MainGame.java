@@ -105,7 +105,6 @@ public class MainGame extends AGame{
             e.printStackTrace();
         }
 //        this.setBackgroundColor(Color.red);
-        
         time = System.currentTimeMillis();
         firstTime = time;
         
@@ -135,9 +134,7 @@ public class MainGame extends AGame{
                     double fps = (ultCount)/((timeNow-firstTime*1.0)/1000);
                     System.out.println("Average fps: "+fps);
                 }
-            });
-            Rectangle r =AccelGame.frame.getBounds();
-            
+            });            
             //AccelGame.frame.getWidth();
             this.v.setHeight(AccelGame.gui.getHeight());
             this.v.setWidth(AccelGame.gui.getWidth());

@@ -10,8 +10,10 @@ import Game.Level;
 import Game.Player;
 import PythonBeans.Lighting;
 import PythonBeans.Lighting.LightingType;
+import PythonBeans.TransparentCell;
 import Utilities.Image2D;
 import Utilities.Vector2;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.RecursiveAction;
@@ -152,6 +154,9 @@ public class CameraRender extends RecursiveAction {
                 }
                 //Check if ray has hit a wall
                 if (level.isWall(mapX, mapY)) {
+                    if(level.getWallSprite(mapX, mapY) instanceof TransparentCell){
+                        continue;
+                    }
                     hit = 1;
                 }
             }
@@ -308,6 +313,158 @@ public class CameraRender extends RecursiveAction {
             //sprites time
             
         }//end for loop
+        
+        //now time for transparent sprites
+        if (level.doesHaveTransparent()) {
+            for (int x = start; x < end; x++) {
+                //calculate ray position and direction 
+                double cameraX = 2 * (x / ((double) w)) - 1; //x-coordinate in camera space
+                double rayDirX = player.getDir().getX() + plane.getX() * cameraX;
+                double rayDirY = player.getDir().getY() + plane.getY() * cameraX;
+
+                //which box of the map we're in  
+                int mapX = (int) (rayPosX);
+                int mapY = (int) (rayPosY);
+
+                //length of ray from current position to next x or y-side
+                double sideDistX;
+                double sideDistY;
+
+                //length of ray from one x or y-side to next x or y-side
+                double rayDirX2 = rayDirX * rayDirX;
+                double rayDirY2 = rayDirY * rayDirY;
+                double deltaDistX = Math.sqrt(1 + (rayDirY2) / (rayDirX2));
+                double deltaDistY = Math.sqrt(1 + (rayDirX2) / (rayDirY2));
+
+                double perpWallDist;
+
+                //what direction to step in x or y-direction (either +1 or -1)
+                int stepX;
+                int stepY;
+
+                int hit = 0; //was there a wall hit?
+                int side = 0; //was a NS or a EW wall hit?
+
+                //calculate step and initial sideDist
+                if (rayDirX < 0) {
+                    stepX = -1;
+                    sideDistX = (rayPosX - mapX) * deltaDistX;
+                } else {
+                    stepX = 1;
+                    sideDistX = (mapX + 1.0 - rayPosX) * deltaDistX;
+                }
+                if (rayDirY < 0) {
+                    stepY = -1;
+                    sideDistY = (rayPosY - mapY) * deltaDistY;
+                } else {
+                    stepY = 1;
+                    sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY;
+                }
+                //perform DDA
+                while (hit == 0) {
+                    //jump to next map square, OR in x-direction, OR in y-direction
+                    if (sideDistX < sideDistY) {
+                        sideDistX += deltaDistX;
+                        mapX += stepX;
+                        side = 0;
+                    } else {
+                        sideDistY += deltaDistY;
+                        mapY += stepY;
+                        side = 1;
+                    }
+                    //Check if ray has hit a wall
+                    if (level.isWall(mapX, mapY)) {
+                        if (level.getWallSprite(mapX, mapY) instanceof TransparentCell) {
+                            hit = 1;
+                            break;
+                        }
+                        hit = 2;
+                    }
+                }
+                if (hit == 2) {
+                    continue;
+                }
+
+                //Calculate distance of perpendicular ray (oblique distance will give fisheye effect!)
+                if (side == 0) {
+                    perpWallDist = Math.abs((mapX - rayPosX + ((1 - stepX) >> 1)) / (rayDirX));
+                } else {
+                    perpWallDist = Math.abs((mapY - rayPosY + ((1 - stepY) >> 1)) / (rayDirY));
+                }
+
+                //Calculate height of line to draw on screen
+                int lineHeight = Math.abs((int) (h / (perpWallDist)));
+
+                //calculate lowest and highest pixel to fill in current stripe
+                int drawStart = (int) ((h >> 1) - (lineHeight >> 1));
+//            drawStart += 50;
+                if (drawStart < 0) {
+                    drawStart = 0;
+                }
+                //trying to look down
+                int drawEnd = (int) ((lineHeight >> 1) + (h >> 1));
+//            drawEnd +=50;
+                if (drawEnd >= h) {
+                    drawEnd = h - 1;
+                }
+                //texturing calculations
+                Image2D texture = level.getWallSprite(mapX, mapY);
+                int invisibleColor = ((TransparentCell) texture).getInvisColor();
+
+                //calculate value of wallX
+                double wallX; //where exactly the wall was hit
+                if (side == 1) {
+                    wallX = rayPosX + ((mapY - rayPosY + ((1 - stepY) >> 1)) / (rayDirY)) * rayDirX;
+                } else {
+                    wallX = rayPosY + ((mapX - rayPosX + ((1 - stepX) >> 1)) / (rayDirX)) * rayDirY;
+                }
+                wallX -= Math.floor((wallX));
+
+                //x coordinate on the texture
+                //assume everything is 64x64
+                int texX = (int) (wallX * texture.getWidth());
+                if (side == 0 && rayDirX > 0) {
+                    texX = texture.getWidth() - texX - 1;
+                }
+                if (side == 1 && rayDirY < 0) {
+                    texX = texture.getWidth() - texX - 1;
+                }
+                //fairly certain to look up and down, we need to move the drawStart and drawEnd points
+                int hAndLine = (lineHeight << 7) - (h << 7);
+
+                double mapActualX = PlayerPosX + rayDirX * perpWallDist, mapActualY = PlayerPosY + rayDirY * perpWallDist;
+                //this reduces the number of lights we need to check for all y points. Still going to, but it's the number that counts
+                ArrayList<Lighting> lights = level.getLightsAtLocation(new Vector2(mapActualX, mapActualY));
+                for (int y = drawStart; y < drawEnd; y++) {
+                    int d = ((y << 8) + hAndLine); //256 and 128 factors to avoid floats
+                    int texY = ((d * texture.getWidth()) / lineHeight) >> 8;
+                    int color = 0;
+                    try {
+                        //shading walls
+                        color = texture.getColor(texX, texY);
+                        if ((color & 0xFFFFFF) != invisibleColor) {
+                            for (Lighting light : lights) {
+                                color = getColor(mapActualX, mapActualY, color, light);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+//                int ny = y +50;
+//                if(ny >= h){
+//                    continue;
+//                }
+                    if ((color & 0xFFFFFF) != invisibleColor) {
+                        dest[y * w + x] = color;
+                        if (y == drawEnd - 1) {//otherwise, there would be an annoying white line along the bottom of the walls....
+                            dest[(y + 1) * w + x] = color;
+                        }
+                        //to eliminate some sprites being drawn over the door
+                        depthBuffer[x] = perpWallDist;
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -377,8 +534,8 @@ public class CameraRender extends RecursiveAction {
     public int getShadeColor(int colorA, int colorB, double distSquare, float length, float intensity, LightingType type) {
         int finalColor = 0;
 
-        int alphaA = colorA & 0xFF000000;
-        int alphaB = colorB & 0xFF000000;
+        int alphaA = (colorA & 0xFF000000);
+        int alphaB = (colorB & 0xFF000000);
 
         int redA = colorA & 0x00FF0000;
         int redB = colorB & 0x00FF0000;
@@ -401,7 +558,7 @@ public class CameraRender extends RecursiveAction {
             
         }
 
-        finalColor |= 0xFF000000 & (int) (alphaA + dist * (alphaB - alphaA));
+        finalColor |= 0xFF000000 & (int) (alphaA*1.0 + dist * (alphaB*1.0 - alphaA*1.0));
         finalColor |= 0x00FF0000 & (int) (redA + dist * (redB - redA));
         finalColor |= 0x0000FF00 & (int) (greenA + dist * (greenB - greenA));
         finalColor |= 0x000000FF & (int) (blueA + dist * (blueB - blueA));

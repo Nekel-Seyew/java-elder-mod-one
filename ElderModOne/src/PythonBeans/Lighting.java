@@ -7,6 +7,7 @@
 package PythonBeans;
 
 import Utilities.Vector2;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -49,6 +50,8 @@ public class Lighting implements Comparable{
     protected long numger;
     
     protected int typeInt;
+    
+    protected double[] alphaComp,redComp,greenComp,blueComp;
     
     public static final int UNIVERSAL =0;
     public static final int AMBIENT =1;
@@ -96,6 +99,14 @@ public class Lighting implements Comparable{
         if(this.direction != null){
             this.direction.scalarMultiply(1/this.direction.length());
         }
+        this.alphaComp = new double[10];
+        this.redComp=new double[10];
+        this.blueComp= new double[10];
+        this.greenComp=new double[10];
+        Arrays.fill(alphaComp, 0xFF000000&this.color);
+        Arrays.fill(alphaComp, 0x00FF0000&this.color);
+        Arrays.fill(alphaComp, 0x0000FF00&this.color);
+        Arrays.fill(alphaComp, 0x000000FF&this.color);
         
     }
 
@@ -157,6 +168,35 @@ public class Lighting implements Comparable{
     
     public int getTypeInt(){
         return this.typeInt;
+    }
+    
+    public double[] getAlphaComp(int size){
+        if(this.alphaComp.length < size){
+            this.alphaComp = new double[size*2];
+            Arrays.fill(this.alphaComp, 0xFF000000&this.color);
+        }
+        return this.alphaComp;
+    }
+    public double[] getRedComp(int size){
+        if(this.redComp.length < size){
+            this.redComp = new double[size*2];
+            Arrays.fill(this.redComp, 0x00FF0000&this.color);
+        }
+        return this.redComp;
+    }
+    public double[] getGreenComp(int size){
+        if(this.greenComp.length < size){
+            this.greenComp = new double[size*2];
+            Arrays.fill(this.greenComp, 0x0000FF00&this.color);
+        }
+        return this.greenComp;
+    }
+    public double[] getBlueComp(int size){
+        if(this.blueComp.length < size){
+            this.blueComp = new double[size*2];
+            Arrays.fill(this.blueComp, 0x000000FF&this.color);
+        }
+        return this.blueComp;
     }
     
     /**

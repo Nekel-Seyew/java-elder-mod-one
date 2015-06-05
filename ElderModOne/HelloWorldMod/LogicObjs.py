@@ -20,14 +20,15 @@ class KeyboardCont(Updateable):
 		#if self.maingame.getPlayer().getPos().distanceSquare(Vector2(20.5,14)) <= (0.5*0.5) :
 			#self.maingame.getPlayer().setPos(Vector2(20.5,7))
 class Door(Updateable):
-	def __init__(self, imgs, time, inviscolor, maingame,keyboard):
+	def __init__(self, imgs, time, inviscolor, maingame,keyboard, pos):
 		self.wall = TransparentCell(imgs, time, inviscolor, False)
 		self.wall.setStop(True)
 		self.game = maingame
 		self.keyboard=keyboard
 		self.walk = False
+		self.pos = pos
 	def update(self):
-		if self.keyboard.isKeyDown('e') and self.game.getPlayer().getAttrib('key'):
+		if self.keyboard.isKeyDown('e') and self.game.getPlayer().getAttrib('key') and self.game.getPlayer().getPos().distanceSquare(self.pos) <= (1):
 			self.wall.setStop(False)
 			self.wall.setRunOnce(True)
 		if self.wall.onLastFrame():

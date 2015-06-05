@@ -302,6 +302,12 @@ public class MainGame extends AGame{
         return (ultCount)/((System.currentTimeMillis()-firstTime*1.0)/1000);
     }
     
+    @Override
+    public void exit(){
+        System.out.println("Average FPS: "+this.getFPS());
+        super.exit();
+    }
+    
     private class mouseRobot implements MouseMotionListener{
         
         Robot robot;

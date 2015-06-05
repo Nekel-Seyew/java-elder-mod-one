@@ -23,6 +23,9 @@ from WorldObjs import Gun
 from WorldObjs import Key
 from Gui import UI
 from Gui import EndGame
+from AI import Testing
+
+from Game import Enemy
 
 print "\nHello, world!"
 level = Level()
@@ -136,10 +139,14 @@ level.addLighting(light)
 #light2 = Lighting(Vector2(20.5,11.5),0xFFFFFF,3,player.getDir().clone(),player.getFov()/4,Lighting.LightingType.directional,0.5)
 #level.addLighting(light2)
 
-#path = Pathfinding.getPath(Vector2(1,1),Vector2(21,12),level)
+path = Pathfinding.getPath(Vector2(1,1),Vector2(21,12),level)
 #for x in path:
     #print x
-
+#enemy = Enemy(,Vector2(1,0),2)
+#enylight = Lighting(enemy.getPos(),0xFFFFFF,2,Vector2(),0.0,Lighting.LightingType.ambient,0.5)
+#level.addLighting(enylight)
+#maingame.addUpdateable(enemy)
+#enemy.moveTo(Vector2(22,11.5),level)
 
 level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(20.5,11.5),0x000000,False))
 level.addSprite(Sprite("HelloWorldMod/sprites/greenlight.png",Vector2(18.5,4.5),0x000000,False))
@@ -203,16 +210,18 @@ level.putWallSprite(90,endgame.getDoor().getTransparentCell())
 
 maingame.giveLevel(level)
 player.setPos(Vector2(22,11.5))
+testing = Testing(player,maingame,level)
+maingame.addUpdateable(testing)
 
-#musak = SoundPlayer("HelloWorldMod/music/Enochian_Magic.mp3")
-#musak.start()
-maingame.addSound("HelloWorldMod/music/Trancer.mp3")
+#music
+sound = maingame.addSound("HelloWorldMod/music/Trancer.mp3")
+endgame.givebackgroundsound(sound)
 
 player.setAttrib("weapons",ArrayList())
 player.setAttrib("health",100)
 player.setAttrib("key",False)
 
-maingame.setBackgroundColor(0x000000)
+maingame.setBackgroundColor(0x00FF00)
 
 #lightEnemy = LightEnemy(Vector2(1,1),Vector2(0,1),2,2,0xFFFFFF,3)
 #lightEnemy.moveTo(player.getPos().clone(),level)

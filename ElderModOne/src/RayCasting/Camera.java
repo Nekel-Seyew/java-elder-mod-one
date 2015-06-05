@@ -25,7 +25,7 @@ import java.util.concurrent.ForkJoinPool;
 public class Camera {
     //Vector2 plane = new Vector2(0, 0.66);
     private Vector2 resolution = new Vector2();
-    private CameraRender r;
+    private CameraRenderYeppp r;
     private ForkJoinPool pool;
     //double[] zBuffer;
     
@@ -41,7 +41,7 @@ public class Camera {
         //this.plane = new Vector2(0, 0.66);
         this.resolution = resolution;
         colorHashMap = new HashMap<Integer,Integer>(64,0.2f);
-        r = new CameraRender(0,(int)resolution.getX(),null,null,null,resolution,(int)resolution.getX()/4);
+        r = new CameraRenderYeppp(0,(int)resolution.getX(),null,null,null,resolution,(int)resolution.getX()/4);
         pool = new ForkJoinPool();
         //sceneOld = new BufferedImage((int)resolution.getX(), (int)resolution.getY(), BufferedImage.TYPE_INT_ARGB);
         buffer = new int[(int)resolution.getX() * (int)resolution.getY()];

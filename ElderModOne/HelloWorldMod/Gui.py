@@ -14,20 +14,25 @@ class UI(Updateable,GuiElement):
 	def draw(self,batch):
 		batch.fillRect(Vector2(0,self.game.GAME_HEIGHT*0.8),self.game.GAME_WIDTH,int(self.game.GAME_HEIGHT*0.2),Color(0x00FF00),200)
 		batch.fillRect(Vector2(5,self.game.GAME_HEIGHT*0.8 + 5),int(self.game.GAME_WIDTH)-10,int(self.game.GAME_HEIGHT*0.2)-10,Color(0xFFFFFF),201)
-		#batch.drawString
+		batch.DrawString(Vector2(8,self.game.GAME_HEIGHT*0.8 + 20),"HEALTH:",Color(0x000000),202)
 class EndGame(Updateable,GuiElement):
 	def __init__(self, maingame,keyboard):
 		self.game = maingame
 		self.addedMusic = False
 		self.sprite = Image2D("HelloWorldMod/sprites/galaxy/galaxy2.png")
 		self.sprite2 = Image2D("HelloWorldMod/sprites/galaxy/stars.jpg")
-		self.tdoor = Door(["HelloWorldMod/sprites/door/door1.png","HelloWorldMod/sprites/door/door2.png","HelloWorldMod/sprites/door/door3.png","HelloWorldMod/sprites/door/door4.png","HelloWorldMod/sprites/door/door5.png","HelloWorldMod/sprites/door/door6.png","HelloWorldMod/sprites/door/door7.png","HelloWorldMod/sprites/door/door8.png","HelloWorldMod/sprites/door/door9.png"],125,0x000000,maingame,keyboard)
+		self.tdoor = Door(["HelloWorldMod/sprites/door/door1.png","HelloWorldMod/sprites/door/door2.png","HelloWorldMod/sprites/door/door3.png","HelloWorldMod/sprites/door/door4.png","HelloWorldMod/sprites/door/door5.png","HelloWorldMod/sprites/door/door6.png","HelloWorldMod/sprites/door/door7.png","HelloWorldMod/sprites/door/door8.png","HelloWorldMod/sprites/door/door9.png"],125,0x000000,maingame,keyboard,Vector2(8,23.5))
+		self.backgrounsound = 0
 	def update(self):
 		if self.game.getPlayer().getPos().distanceSquare(Vector2(8,23.5)) <= (0.5*0.5):
 			if not self.addedMusic:
 				self.game.addSound("HelloWorldMod/music/Enochian_Magic.mp3")
 				self.addedMusic=True
+				if not self.backgrounsound == 0:
+					self.game.getSoundBatch().pauseSound(self.backgrounsound)
 			self.tdoor.setWalkthrough(True)
+	def givebackgroundsound(self,sound):
+		self.backgrounsound=sound
 	def getDoor(self):
 		return self.tdoor
 	def draw(self,batch):

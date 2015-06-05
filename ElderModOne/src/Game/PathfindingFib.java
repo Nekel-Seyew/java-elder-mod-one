@@ -35,8 +35,8 @@ public class PathfindingFib {
 //        Q.add(st);
         Entry<Node> stn =Q.enqueue(st, 0.0);
         neighbors[(int)start.getX()][(int)start.getY()] = stn;
-        for(int x =0; x<level.walls.length; x++){
-            for(int y=0; y<level.walls[x].length; y++){
+        for(int x =0; x<level.walls[0].length; x++){
+            for(int y=0; y<level.walls.length; y++){
                 if(!(y ==(int)start.getX() && x == (int)start.getY()) && !level.isWall(x, y)){
                     Node n = new Node(x,y,Integer.MAX_VALUE);
                     n.setParent(null);

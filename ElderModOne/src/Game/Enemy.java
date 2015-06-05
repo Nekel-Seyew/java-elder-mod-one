@@ -181,6 +181,10 @@ public class Enemy implements Updateable{
         this.level = level;
     }
     
+    public boolean isMoveTo(){
+        return this.moveto;
+    }
+    
     /**
      * Obtain the attribute 
      * @param s

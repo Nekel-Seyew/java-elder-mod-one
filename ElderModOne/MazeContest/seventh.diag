@@ -1,0 +1,73 @@
+$START={
+    @ST=Yes indeed. You've accelerated again.;
+    #PC:{"A recursively infinitesimal moment...";->1;}
+    #PC:{"-sigh- I guess I needn't bother bringing up Plank Time.";->1;}
+}
+
+$1={
+    @ST=Heh... you sure did learn a lot in Archilage.;
+    #PC:{"Archilage... that's where I was trained to be a Twizarech.";->3;}
+    #PC:{"Archilage... wait, how do you know about that!?";->2;}
+}
+
+$2={
+    @ST=Still asking these questions... it's both praiseworthy, and admonishable.;
+    #PC:{(Next);->3;}
+}
+
+$3={
+    @ST=So peculiar, being a Twizarech...;
+    #PC:{(Next);->4;}
+}
+
+$4={
+    @ST=You are learned... and yet you're a magician!;
+    #PC:{"I don't see any contradiction.";->13;}
+    #PC:{"I'm from the school of Tech-Users. Magic isn't my specialty.";->5;}
+}
+
+$13={
+    @ST=And yet from out conversations, it seems like you see nothing BUT contradiction in these walls.;
+    #PC:{"Well, I'm from the school of Tech-Users. Magic isn't my specialty.";->5;}
+}
+
+$5={
+    @ST=...;
+    #PC:{"Which is why I...";->6;}
+    #PC:{"Which is why I NEVER should have...";->6;}
+}
+
+$6={
+    @ST=Go on.;
+    #PC:{"...";->7;}
+}
+
+$7={
+    @ST=...;
+    #PC:{"...in Archilage, I had sought out... the Shenumedad Technique.";->8;}
+}
+
+$8={
+    @ST=...;
+    #PC:{"A way to hone and increase one's magical ability.";->9;}
+}
+
+$9={
+    @ST=(Next);
+    #PC:{"But it's an advanced technique. An incredibly advanced technique.";->10;}
+}
+
+$10={
+    @ST=(Next);
+    #PC:{"Once I got deep enough into it, I couldn't control it.";->11;}
+}
+
+$11={
+    @ST=(Next);
+    #PC:{"And then...";->12;}
+}
+
+12={
+    @ST=(Next);
+    #PC:{"...and then...";->END;}
+}

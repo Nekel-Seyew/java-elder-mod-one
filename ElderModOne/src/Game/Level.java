@@ -54,6 +54,9 @@ public class Level {
     public void putWallSprite(int i, String[] frames, long timediff){
         wallsprites.put(i, new AnimatedCell(frames,timediff));
     }
+    public void putWallSprite(int i, AnimatedCell ac){
+        wallsprites.put(i,ac);
+    }
     public void putWallSprite(int i, TransparentCell tc){
         wallsprites.put(i, tc);
         this.haveTransparent=true;
@@ -113,7 +116,9 @@ public class Level {
     public void removeSprite(Drawable sprite){
         this.sprites.remove(sprite);
     }
-    
+    public void removeLighting(Lighting light){
+        this.lights.remove(light);
+    }
     public void ensureSortedLights(){
         Collections.sort(lights);
     }

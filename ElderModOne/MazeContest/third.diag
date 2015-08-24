@@ -1,0 +1,4 @@
+$START={
+    @ST=...to the infinite depths that await you.;
+    #PC:{(Next);->END;}
+}

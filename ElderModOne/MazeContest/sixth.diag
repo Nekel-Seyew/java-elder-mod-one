@@ -1,0 +1,9 @@
+$START={
+    @ST=I don't expect you'll be punished for killing Dreams.;
+    #PC:{(Next);->1;}
+}
+
+$1={
+    @ST=But I don't expect you'll be saved from them, either.;
+    #PC:{(Next);->END;}
+}

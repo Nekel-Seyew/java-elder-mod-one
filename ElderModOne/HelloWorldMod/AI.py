@@ -16,12 +16,13 @@ class Testing(Updateable):
 		self.enemy = Enemy(player.getPos(),player.getDir(),1)
 		self.maingame = maingame
 		self.player = player
-		self.locations = [Vector2(1,1),Vector2(14,12),Vector2(1,21),Vector2(22,21)]
+		self.locations = [Vector2(1,1),Vector2(14,12),Vector2(1,21),Vector2(22,21),Vector2(15,20),Vector2(22,2),Vector2(1,1),Vector2(8,21),Vector2(1,1),Vector2(22,11.5)]
 		self.index = 0
 		self.level=level
 		maingame.addUpdateable(self.enemy)
 	def update(self):
 		if self.index+1 == len(self.locations):
+			self.maingame.exit()
 			return
 		if not self.enemy.isMoveTo():
 			self.enemy.moveTo(self.locations[self.index],self.level)

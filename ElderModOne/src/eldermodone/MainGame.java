@@ -99,6 +99,7 @@ public class MainGame extends AGame{
             pyInterp.set("player", player);
             pyInterp.set("maingame", this);
             pyInterp.set("keyboard", this.keyboard);
+            pyInterp.set("mouse", this.mouse);
             pyInterp.exec("import sys");
         } 
         catch (Exception e) {

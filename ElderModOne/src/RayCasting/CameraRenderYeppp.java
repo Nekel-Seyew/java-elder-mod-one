@@ -42,6 +42,8 @@ public class CameraRenderYeppp extends RecursiveAction {
     int[] xiarray, yiarray, sumiarray;
     float[] yarray;
     float[] working, cInv256, vLineHight, vH,vLineHalf, vTexWidth;
+    double[] alpha ,red, green, blue;
+    double[] calpha ,cred, cgreen, cblue;
     
     CameraRenderYeppp A, B;
     
@@ -78,6 +80,14 @@ public class CameraRenderYeppp extends RecursiveAction {
         vH= new float[(int)resolution.getX()];
         vTexWidth= new float[(int)resolution.getX()];
         vLineHalf= new float[(int)resolution.getX()];
+        alpha =new double[(int)resolution.getX()];
+        red=new double[(int)resolution.getX()];
+        green=new double[(int)resolution.getX()];
+        blue=new double[(int)resolution.getX()];
+        calpha =new double[(int)resolution.getX()];
+        cred=new double[(int)resolution.getX()];
+        cgreen=new double[(int)resolution.getX()];
+        cblue=new double[(int)resolution.getX()];
         for(int i=0; i<yarray.length; i++){
             yarray[i]=i;
             working[i]=0;
@@ -258,11 +268,7 @@ public class CameraRenderYeppp extends RecursiveAction {
             
             //int colorx = 0xFFFFFFFF;
             int[][] textureRaw = texture.getColumnMajorColorMap();
-            double[] alpha = new double[(drawEnd-drawStart)+1];
-            double[] red = new double[(drawEnd-drawStart)+1];
-            double[] green = new double[(drawEnd-drawStart)+1];
-            double[] blue = new double[(drawEnd-drawStart)+1];
-            int[] workingk = new int[(drawEnd-drawStart)+1];
+            //int[] workingk = new int[(drawEnd-drawStart)+1];
             for(int i= drawStart; i<drawEnd+1; i++){
                 alpha[i-drawStart] = 0xFF000000 & textureRaw[(int)working[i]][texX];
                 red[i-drawStart] = 0x00FF0000 & textureRaw[(int)working[i]][texX];
@@ -270,10 +276,6 @@ public class CameraRenderYeppp extends RecursiveAction {
                 blue[i-drawStart] = 0x000000FF & textureRaw[(int)working[i]][texX];
             }
             //forColor
-            double[] calpha = new double[(drawEnd-drawStart)+1];
-            double[] cred = new double[(drawEnd-drawStart)+1];
-            double[] cgreen = new double[(drawEnd-drawStart)+1];
-            double[] cblue = new double[(drawEnd-drawStart)+1];
             System.arraycopy(alpha, 0, calpha, 0, alpha.length);
             System.arraycopy(red, 0, cred, 0, red.length);
             System.arraycopy(green, 0, cgreen, 0, green.length);
@@ -379,6 +381,9 @@ public class CameraRenderYeppp extends RecursiveAction {
                 drawEnd = h;
             }
 
+            //to yepp-ify this: 1)build up array of all the pixels to be colored.2)Color them
+            double[] xpos = new double[h];
+            double[] ypos = new double[h];
             //now draw floor and ceiling
             for (int y = drawEnd + 1; y < h; y++) {
                 currentDist = h / (2.0 * y - h);
@@ -386,6 +391,12 @@ public class CameraRenderYeppp extends RecursiveAction {
                 double minusWeight1 = 1.0 - weight;
                 double currentFloorX = weight * floorXWall + (minusWeight1) * PlayerPosX;
                 double currentFloorY = weight * floorYWall + (minusWeight1) * PlayerPosY;
+                
+                //yepp
+                xpos[y]=currentFloorX;
+                xpos[h-y]=currentFloorX;
+                ypos[y]=currentFloorY;
+                ypos[h-y]=currentFloorY;
 
                 Image2D floor = level.getFloorSprite((int) currentFloorX, (int) currentFloorY);
                 Image2D ceil = level.getCeilSprite((int) currentFloorX, (int) currentFloorY);
@@ -402,8 +413,12 @@ public class CameraRenderYeppp extends RecursiveAction {
                 if (floor != null) {
                     floorPix = floor.getColor(Math.abs(floorTexX), Math.abs(floorTexY));
                     //shading!
+                    alpha[y] = 0xFF000000 & floorPix;
+                    red[y] = 0x00FF0000 & floorPix;
+                    green[y] = 0x0000FF00 & floorPix;
+                    blue[y] = 0x000000FF & floorPix;
                     for (Lighting light : level.getLighting()) {
-                        floorPix = getColor(currentFloorX,currentFloorY,floorPix,light);
+                        floorPix = getColor(currentFloorX, currentFloorY, floorPix, light);
                     }
 //                    int ny=y +50;
 //                    if(ny >= h){
@@ -420,7 +435,12 @@ public class CameraRenderYeppp extends RecursiveAction {
 //                    }
                     int ceilPix = ceil.getColor(Math.abs(floorTexX), Math.abs(floorTexY));
                     //shading!
+                    alpha[h-y] = 0xFF000000 & ceilPix;
+                    red[h-y] = 0x00FF0000 & ceilPix;
+                    green[h-y] = 0x0000FF00 & ceilPix;
+                    blue[h-y] = 0x000000FF & ceilPix;
                     for (Lighting light : level.getLighting()) {
+                        
                         ceilPix = getColor(currentFloorX,currentFloorY,ceilPix,light);
                     }
                     dest[(h - y) * w + x] = ceilPix;
@@ -428,7 +448,38 @@ public class CameraRenderYeppp extends RecursiveAction {
                         dest[(h - (y + 1)) * w + x] = ceilPix;
                     }
                 }
+                System.arraycopy(alpha, 0, calpha, 0, alpha.length);
+                System.arraycopy(red, 0, cred, 0, red.length);
+                System.arraycopy(green, 0, cgreen, 0, green.length);
+                System.arraycopy(blue, 0, cblue, 0, blue.length);
+                for (Lighting light : level.getLighting()) {
+                    if (light.getTypeInt() == Lighting.UNIVERSAL) {
+                        //colorx = getShadeColor(colorx, light.getColor(), 0, 0, light.getIntensity(), light.getType());
+                        double[] percent = new double[(drawEnd - drawStart) + 1];
+                        Arrays.fill(percent, light.getIntensity());
+                        Core.Subtract_V64fV64f_V64f(light.getAlphaComp(drawEnd - drawStart), 0, calpha, 0, calpha, 0, calpha.length);
+                        Core.Subtract_V64fV64f_V64f(light.getRedComp(drawEnd - drawStart), 0, cred, 0, cred, 0, cred.length);
+                        Core.Subtract_V64fV64f_V64f(light.getGreenComp(drawEnd - drawStart), 0, cgreen, 0, cgreen, 0, cgreen.length);
+                        Core.Subtract_V64fV64f_V64f(light.getBlueComp(drawEnd - drawStart), 0, cblue, 0, cblue, 0, cblue.length);
+                        Core.Multiply_V64fV64f_V64f(percent, 0, calpha, 0, calpha, 0, calpha.length);
+                        Core.Multiply_V64fV64f_V64f(percent, 0, cred, 0, cred, 0, cred.length);
+                        Core.Multiply_V64fV64f_V64f(percent, 0, cgreen, 0, cgreen, 0, cgreen.length);
+                        Core.Multiply_V64fV64f_V64f(percent, 0, cblue, 0, cblue, 0, cblue.length);
+                        Core.Add_V64fV64f_V64f(alpha, 0, calpha, 0, calpha, 0, calpha.length);
+                        Core.Add_V64fV64f_V64f(red, 0, cred, 0, cred, 0, cred.length);
+                        Core.Add_V64fV64f_V64f(green, 0, cgreen, 0, cgreen, 0, cgreen.length);
+                        Core.Add_V64fV64f_V64f(blue, 0, cblue, 0, cblue, 0, cblue.length);
+                    }else{
+                        
+                    }
+
+                    System.arraycopy(calpha, 0, alpha, 0, alpha.length);
+                    System.arraycopy(cred, 0, red, 0, red.length);
+                    System.arraycopy(cgreen, 0, green, 0, green.length);
+                    System.arraycopy(cblue, 0, blue, 0, blue.length);
+                }
             }
+
             //End of Ceiling and Floor
             
             //sprites time

@@ -25,7 +25,7 @@ import java.util.concurrent.ForkJoinPool;
 public class Camera {
     //Vector2 plane = new Vector2(0, 0.66);
     private Vector2 resolution = new Vector2();
-    private CameraRenderYeppp r;
+    private CameraRender r;
     private ForkJoinPool pool;
     //double[] zBuffer;
     
@@ -41,7 +41,7 @@ public class Camera {
         //this.plane = new Vector2(0, 0.66);
         this.resolution = resolution;
         colorHashMap = new HashMap<Integer,Integer>(64,0.2f);
-        r = new CameraRenderYeppp(0,(int)resolution.getX(),null,null,null,resolution,(int)resolution.getX()/4);
+        r = new CameraRender(0,(int)resolution.getX(),null,null,null,resolution,(int)resolution.getX()/4);
         pool = new ForkJoinPool();
         //sceneOld = new BufferedImage((int)resolution.getX(), (int)resolution.getY(), BufferedImage.TYPE_INT_ARGB);
         buffer = new int[(int)resolution.getX() * (int)resolution.getY()];
@@ -57,6 +57,7 @@ public class Camera {
     New strategy, the levels, when loaded, are going to Transpose themselves.
     */
     public void render(Level level, Player player, ImageCollection batch) {
+        try{
         BufferedImage scene = new BufferedImage((int)resolution.getX(), (int)resolution.getY(), BufferedImage.TYPE_INT_ARGB);
         int[] buffer = this.buffer;
         //generate the plane vector
@@ -156,7 +157,10 @@ public class Camera {
                 (float)(AccelGame.frame.getWidth()/resolution.getX()), 
                 (float)(AccelGame.frame.getHeight()/resolution.getY()), 
                 100);
-    }
+        }catch(Exception e){
+            //bad, I know... will fix later, to be more robust and failsafe
+        }
+     }
     
     private double notZero(double in) {
         if (Math.abs(0 - in) < 1E-6) {

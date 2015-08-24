@@ -1,0 +1,74 @@
+$START={
+    @ST=Ah, You've Found the second one!;
+    #PC:{"Why, when I use them, does everything change color, slightly?";->1;}
+}
+
+$1={
+    @ST=Good, good, you ask the right questions... now listen carefully.;
+    #PC:{(Next);->2;}
+}
+
+$2={
+    @ST=On the surface, the Plane of Dreams may appear as nonsense... unpredictable... inconsistent... and in a sense, that's true.;
+    #PC:{(Next);->3;}
+}
+
+$3={
+    @ST=But in another sense... it's more consistent than anything you've ever known.;
+    #PC:{“I doubt that.;->4;}
+    #PC:{“I guess it would be too consistent to always be inconsistent...;->5;}
+}
+
+$4={
+    @ST=Well, just to start with, there's Time.;
+    #PC:{(Next);->6;}
+}
+
+$5={
+    @ST=Just to start with, there's Time.;
+    #PC:{(Next);->6;}
+}
+
+$6={
+    @ST=The colors have shown you that, unlike space, Time here may be governed by rules.;
+    #PC:{"So, wait, what? And why does the world change? You said space isn't governed by rules!";->7;}
+}
+
+$7={
+    @ST=(A sly nod.) I Did. So if space has not changed then...;
+    #PC:{"...are you saying...?";->8;}
+}
+
+$8={
+    @ST=...that Time has changed? Yes indeed! … Well, nearly so.;
+    #PC:{"...";->9;}
+    #PC:{"...";->9;}
+}
+
+$9={
+    @ST=And more accurately, it's not time itself that's changed, but rather...;
+    #PC:{"...";->10;}
+    #PC:{"...";->10;}
+    #PC:{"...";->10;}
+}
+
+$10={
+    @ST=It's you who's really accelerated! The world is simply speed up to meet you.;
+    #PC:{"THERE'S NO WAY MY BODY COULD TAKE THAT!";->11;}
+    #PC:{"WE'D HAVE TO BE MOVING NEAR THE SPEED OF LIGHT!";->11;}
+}
+
+$11={
+    @ST=Heh heh... you're quick to forget the circumstances, it seems.;
+    #PC:{"I Tire of this. Can you help me escape this rabbit hole of nightmare!?";->12;}
+}
+
+$12={
+    @ST=Oh, Very well. If you can master time travel, and manipulate each layer to your advantage...;
+    #PC:{(Next);->13;}
+}
+
+$13={
+    @ST=Then when all the lights are turned on, I'll deliver you from here. To go between, you might need to (q)uickl(e)y switch between orbs;
+    #PC:{"Wait, but I don't want to...";->END;}
+}

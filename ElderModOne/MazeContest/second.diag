@@ -1,0 +1,42 @@
+$START={
+    @ST=....;
+    #PC:{"What is that?";->1;}
+    #PC:{"You again....";->1;}
+}
+
+$1={
+    @ST=That is an Orb.;
+    #PC:{"Obviously it's a sphere.";->3;}
+    #PC:{"...And it is round...";->2;}
+}
+
+$2={
+    @ST=-chuckle- Yes it is round. But It does something fantastic!;
+    #PC:{(!);->4;}
+}
+
+$3={
+    @ST=Is it so obvious now? If So, then what does it do?;
+    #PC:{"It stays round, and apparently large.";->4;}
+    #PC:{"It...um...It stays round?";->4;}
+}
+
+$4={
+    @ST=It, in turn, will give you what you want.;
+    #PC:{"An Escape?";->5;}
+}
+
+$5={
+    @ST=But...;
+    #PC:{(Next);->6;}
+}
+
+$6={
+    @ST=...only if you give yourself...;
+    #PC:{(Next);->7;}
+}
+
+$7={
+    @ST=if you know how...(left and right MButtons)...Oh and Remember to (F)lip the switch!;
+    #PC:{(Next);->END;}
+}

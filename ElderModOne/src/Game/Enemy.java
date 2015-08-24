@@ -7,6 +7,7 @@
 package Game;
 
 import PythonBeans.Updateable;
+import Utilities.Mouse;
 import Utilities.Vector2;
 import java.util.Hashtable;
 

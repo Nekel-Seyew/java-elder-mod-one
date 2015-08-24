@@ -1,0 +1,74 @@
+$START={
+    @ST=Why do you keep looking in the same directions?;
+    #PC:{"Who are you?";->1;}
+    #PC:{"These are the only two.";->2;}
+}
+
+$1={
+    @ST=I get asked that a lot. And in return, I say this a lot: “I Asked First.”;
+    #PC:{"Well... I've looked everywhere.";->2;}
+}
+
+$2={
+    @ST=Really now...?;
+    #PC:{"Yes, really.";->4;}
+    #PC:{"I've tried the floor and the ceiling, if that's what you're getting at.";->3;}
+}
+
+$3={
+    @ST=Heh heh... you fancy yourself pretty clever.;
+    #PC:{(Next);->4;}
+}
+
+$4={
+    @ST=Alright, let's count them all off.;
+    #PC:{(Next);->5;}
+}
+
+$5={
+    @ST=You can't go forward or back. That's one dimension.;
+    #PC:{(Next);->6;}
+}
+
+$6={
+    @ST=You can't go left or right. That's two dimensions.;
+    #PC:{(Next);->7;}
+}
+
+$7={
+    @ST=And you can't go up or down. That's a third.;
+    #PC:{"I can't even tilt my head up or down.";->8;}
+    #PC:{"The fourth is... time?";->10;}
+    #PC:{"A fourth axis? The Plane of Dreams is like a hypercube?";->8;}
+}
+
+$8={
+    @ST=Space here definitely is strange like that...;
+    #PC:{(Next);->9;}
+}
+
+$9={
+    @ST=...so you'll have to think outside of it to navigate this place.;
+    #PC:{(Next);->4;}
+}
+
+$10={
+    @ST=(A sly nod.);
+    #PC:{"You can go back in time here? Okay, that's a bit much.";->11;}
+    #PC:{"Technically, aren't we moving forward in time right now?";->11;}
+}
+
+$11={
+    @ST=Heh heh...;
+    #PC:{(Next);->12;}
+}
+
+$12={
+    @ST=Still need to think a little further.;
+    #PC:{(Next);->13;}
+}
+
+$13={
+    @ST=You turn around.;
+    #PC:{(Next);->END;}
+}

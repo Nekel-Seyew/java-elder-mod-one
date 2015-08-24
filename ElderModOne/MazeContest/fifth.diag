@@ -1,0 +1,50 @@
+$START={
+    @ST=...;
+    #PC:{"What do you have to say this time?";->END;}
+    #PC:{"The Drenji... do they think?";->1;}
+}
+
+$1={
+    @ST=That's a difficult one to answer.;
+    #PC:{(Next);->2;}
+}
+
+$2={
+    @ST=I'll tell you this much, though...;
+    #PC:{(Next);->3;}
+}
+
+$3={
+    @ST=...there's a bond of preservation between life in the layers of time. One that's unbreakable.;
+    #PC:{(Next);->4;}
+}
+
+$4={
+    @ST=Whatever you do, you cannot shoot a Drenji that isn't accelerated.;
+    #PC:{"And if I shoot the ones that are?";->5;}
+    #PC:{"Noted.";->6;}
+}
+
+$5={
+    @ST=Well, they die.;
+    #PC:{(Next);->6;}
+}
+
+$6={
+    @ST=So.;
+    #PC:{(Next);->7;}
+
+$7={
+    @ST=If you shoot the statues in your way, you will crumble.;
+    #PC:{(Next);->8;}
+}
+
+$8={
+    @ST=If you leave a Drenji alive, they will become a statue in your way.;
+    #PC:{(Next);->9;}
+}
+
+$9={
+    @ST=Heh heh heh... it's an age-old dilemma.;
+    #PC:{(Next);->END;}
+}
